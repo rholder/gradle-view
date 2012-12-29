@@ -1,0 +1,39 @@
+<idea-plugin version="2">
+  <name>Gradle View</name>
+  <description>This plugin shows a tree rollup of the Gradle dependencies.</description>
+  <version>1.0.0</version>
+  <vendor>rholder</vendor>
+
+  <!-- please see http://confluence.jetbrains.net/display/IDEADEV/Build+Number+Ranges for description -->
+  <idea-version since-build="107.105"/>
+  <depends>com.intellij.modules.lang</depends>
+
+  <application-components>
+  </application-components>
+
+  <project-components>
+        <component>
+            <implementation-class>com.github.rholder.gradle.service.GradleService</implementation-class>
+        </component>
+  </project-components>
+
+  <actions>
+      <group id="GradleView.NavigatorActionsToolbar">
+          <action id="GradleView.Refresh"
+                  class="com.github.rholder.gradle.ui.RefreshTreeAction"
+                  text="Refresh"
+                  description="Refresh the Gradle view"
+                  icon="/actions/sync.png"/>
+          <action id="GradleView.Reset"
+                  class="com.github.rholder.gradle.ui.ResetTreeAction"
+                  text="Load"
+                  description="Load the Gradle view from another project"
+                  icon="/actions/menu-open.png"/>
+      </group>
+
+  </actions>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="Gradle View" anchor="bottom" factoryClass="com.github.rholder.gradle.ui.GradleViewToolWindowFactory" icon="/general/add.png"/>
+  </extensions>
+</idea-plugin>
