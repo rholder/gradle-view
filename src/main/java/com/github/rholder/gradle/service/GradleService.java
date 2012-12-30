@@ -2,19 +2,19 @@ package com.github.rholder.gradle.service;
 
 import com.github.rholder.gradle.dependency.GradleDependency;
 import com.github.rholder.gradle.log.ToolingLogger;
-import com.github.rholder.gradle.log.ToolingLoggerOutputStream;
 import com.google.common.collect.Maps;
 import com.intellij.openapi.components.AbstractProjectComponent;
 import com.intellij.openapi.project.Project;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
+import org.gradle.tooling.ProgressEvent;
+import org.gradle.tooling.ProgressListener;
 import org.gradle.tooling.ProjectConnection;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -50,7 +50,7 @@ public class GradleService extends AbstractProjectComponent {
         }
     }
 
-    public static Map<String, GradleDependency> loadProjectDependencies(String projectPath, ToolingLogger toolingLogger) {
+    public static Map<String, GradleDependency> loadProjectDependencies(String projectPath, final ToolingLogger toolingLogger) {
         // TODO find all sub-dir's with build.gradle, run gradle dependencies in each one
         // TODO store cache of computed dependency tree
         if(projectPath == null) {
@@ -61,13 +61,16 @@ public class GradleService extends AbstractProjectComponent {
                 .forProjectDirectory(new File(projectPath))
                 .connect();
 
-        ByteArrayOutputStream rawOutputStream = new ByteArrayOutputStream();
-        OutputStream outputStream = new ToolingLoggerOutputStream(rawOutputStream, toolingLogger);
-
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             BuildLauncher launcher = connection.newBuild().forTasks("dependencies");
             launcher.setStandardOutput(outputStream);
             launcher.setStandardError(outputStream);
+            launcher.addProgressListener(new ProgressListener() {
+                public void statusChanged(ProgressEvent event) {
+                    toolingLogger.log(event.getDescription());
+                }
+            });
 
             launcher.run();
         } finally {
@@ -78,7 +81,7 @@ public class GradleService extends AbstractProjectComponent {
         GradleDependency dependency;
         try {
             outputStream.close();
-            dependency = loadDependenciesFromText(new ByteArrayInputStream(rawOutputStream.toByteArray()));
+            dependency = loadDependenciesFromText(new ByteArrayInputStream(outputStream.toByteArray()));
             dependencyMap.put("root", dependency);
         } catch (IOException e) {
             throw new RuntimeException(e);
