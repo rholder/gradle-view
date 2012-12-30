@@ -1,9 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 
-//def toolingApiVersion = gradle.gradleVersion
-def toolingApiVersion = 1.2
-
 repositories {
     maven {
         url 'http://repo.gradle.org/gradle/libs-releases-local'
@@ -12,14 +9,24 @@ repositories {
 }
 
 dependencies {
-    compile "org.gradle:gradle-tooling-api:${toolingApiVersion}"
-    // need an SLF4J implementation at runtime
+    compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     runtime 'org.slf4j:slf4j-simple:1.6.6'
 }
 
 // enable Gradle Wrapper support for bootstrapping with specific version
 task wrapper(type: Wrapper) {
-    gradleVersion = toolingApiVersion
+    gradleVersion = gradleToolingApiVersion
+}
+
+idea.module {
+    jdkName = ideaPluginJdkName
+    iml {
+        withXml {
+            def node = it.asNode()
+            node.attributes().put('type','PLUGIN_MODULE')
+        }
+    }
 }
 
 // TODO figure out how to bundle up plugin from Gradle
+
