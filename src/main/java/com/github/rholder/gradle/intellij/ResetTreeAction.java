@@ -1,6 +1,5 @@
-package com.github.rholder.gradle.ui;
+package com.github.rholder.gradle.intellij;
 
-import com.github.rholder.gradle.service.GradleService;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;

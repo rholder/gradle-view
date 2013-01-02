@@ -13,19 +13,19 @@
 
     <project-components>
         <component>
-            <implementation-class>com.github.rholder.gradle.service.GradleService</implementation-class>
+            <implementation-class>com.github.rholder.gradle.intellij.GradleService</implementation-class>
         </component>
     </project-components>
 
     <actions>
         <group id="GradleView.NavigatorActionsToolbar">
             <action id="GradleView.Refresh"
-                    class="com.github.rholder.gradle.ui.RefreshTreeAction"
+                    class="com.github.rholder.gradle.intellij.RefreshTreeAction"
                     text="Refresh"
                     description="Refresh the Gradle view"
                     icon="/actions/sync.png"/>
             <action id="GradleView.Reset"
-                    class="com.github.rholder.gradle.ui.ResetTreeAction"
+                    class="com.github.rholder.gradle.intellij.ResetTreeAction"
                     text="Load"
                     description="Load the Gradle view from another project"
                     icon="/actions/menu-open.png"/>
@@ -34,6 +34,6 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="Gradle View" anchor="bottom" factoryClass="com.github.rholder.gradle.ui.GradleViewToolWindowFactory" icon="/general/add.png"/>
+        <toolWindow id="Gradle View" anchor="bottom" factoryClass="com.github.rholder.gradle.intellij.GradleViewToolWindowFactory" icon="/general/add.png"/>
     </extensions>
 </idea-plugin>

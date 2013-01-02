@@ -8,6 +8,13 @@ import java.util.TreeSet;
 
 public class TreeUtil {
 
+    /**
+     * Recursively convert the given dependency to a collection of nested
+     * DefaultMutableTreeNode instances suitable for display in a tree
+     * structure, returning the given converted dependency that was passed in.
+     *
+     * @param dependency
+     */
     public static DefaultMutableTreeNode convertToTreeNode(GradleDependency dependency) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dependency);
         for(GradleDependency d : dependency.dependencies) {
@@ -16,8 +23,14 @@ public class TreeUtil {
         return node;
     }
 
-    // --- begin sorted deps
-    public static DefaultMutableTreeNode generateSortedDependencies(GradleDependency root) {
+    /**
+     * Return a lexicographically sorted and flattened DefaultMutableTreeNode
+     * root where its children are all the de-duplicated nodes from the given
+     * dependency node root.
+     *
+     * @param root
+     */
+    public static DefaultMutableTreeNode convertToSortedTreeNode(GradleDependency root) {
         // top level GradleDependency instances are actually the configuration strings
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(root);
         for(GradleDependency configuration : root.dependencies) {
@@ -35,22 +48,32 @@ public class TreeUtil {
         return rootNode;
     }
 
-    private static Set<GradleDependency> getChildrenFromRootNode(GradleDependency dependency) {
+    /**
+     * Recursively walk all the children of the given dependency and return a
+     * flattened Set containing each of them (sorted lexicographically).
+     *
+     * @param topNode the top dependency node to start from
+     */
+    private static Set<GradleDependency> getChildrenFromRootNode(GradleDependency topNode) {
         Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
-        for(GradleDependency d : dependency.dependencies) {
-            sortedDependencies.addAll(getChildrenNodes(d));
+        for(GradleDependency d : topNode.dependencies) {
+            sortedDependencies.addAll(getChildNodes(d));
         }
         return sortedDependencies;
     }
 
-    private static Set<GradleDependency> getChildrenNodes(GradleDependency dependency) {
+    /**
+     * Recursively walk all the children of the given dependency and return a
+     * flattened Set containing each of them (sorted lexicographically).
+     *
+     * @param node the dependency node to gather child nodes from
+     */
+    private static Set<GradleDependency> getChildNodes(GradleDependency node) {
         Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
-        sortedDependencies.add(dependency);
-        for(GradleDependency d : dependency.dependencies) {
-            sortedDependencies.addAll(getChildrenNodes(d));
+        sortedDependencies.add(node);
+        for(GradleDependency d : node.dependencies) {
+            sortedDependencies.addAll(getChildNodes(d));
         }
         return sortedDependencies;
     }
-    // --- end sorted deps
-
 }

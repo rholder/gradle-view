@@ -57,6 +57,3 @@ task distPlugin(type: Zip, dependsOn: jar) {
 task wrapper(type: Wrapper) {
     gradleVersion = gradleToolingApiVersion
 }
-
-// TODO figure out how to bundle up plugin from Gradle
-

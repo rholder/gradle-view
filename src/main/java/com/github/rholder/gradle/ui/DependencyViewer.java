@@ -1,10 +1,8 @@
 package com.github.rholder.gradle.ui;
 
-import com.github.rholder.gradle.dependency.DependencyCellRenderer;
 import com.github.rholder.gradle.dependency.GradleDependency;
 import com.github.rholder.gradle.log.ToolingLogger;
-import com.github.rholder.gradle.service.GradleService;
-import com.github.rholder.gradle.service.GradleServiceListener;
+import com.github.rholder.gradle.intellij.GradleService;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -31,7 +29,7 @@ import java.util.Map;
 
 import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependencies;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
-import static com.github.rholder.gradle.ui.TreeUtil.generateSortedDependencies;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
 
 public class DependencyViewer extends SimpleToolWindowPanel {
 
@@ -52,7 +50,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
         // TODO clean all of this up
         GradleService gradleService = ServiceManager.getService(project, GradleService.class);
-        gradleService.addListener(new GradleServiceListener() {
+        gradleService.addListener(new ViewActionListener() {
             public void refresh() {
                 if(shouldPromptForCurrentProject) {
                     switch(useCurrentProjectBuild()) {
@@ -117,7 +115,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         final SimpleTree leftTree = new SimpleTree(leftModel);
         leftTree.setCellRenderer(new DependencyCellRenderer());
 
-        TreeModel rightModel = new DefaultTreeModel(generateSortedDependencies(dependency));
+        TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(dependency));
         final SimpleTree rightTree = new SimpleTree(rightModel);
         rightTree.setCellRenderer(new DependencyCellRenderer());
 

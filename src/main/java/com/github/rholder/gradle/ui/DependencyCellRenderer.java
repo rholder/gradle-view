@@ -1,4 +1,6 @@
-package com.github.rholder.gradle.dependency;
+package com.github.rholder.gradle.ui;
+
+import com.github.rholder.gradle.dependency.GradleDependency;
 
 import javax.swing.JLabel;
 import javax.swing.JTree;

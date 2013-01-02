@@ -1,10 +1,10 @@
-package com.github.rholder.gradle.service;
+package com.github.rholder.gradle.ui;
 
 /**
  * Implementations of this class define behaviours for actions that are
- * coordinated through the shared GradleService.
+ * coordinated through asynchronous UI bindings.
  */
-public interface GradleServiceListener {
+public interface ViewActionListener {
 
     /**
      * Perform the reset action on the Gradle dependency view.
