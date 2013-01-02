@@ -1,6 +1,8 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 
+version = '1.0.0-SNAPSHOT'
+
 repositories {
     maven {
         url 'http://repo.gradle.org/gradle/libs-releases-local'
@@ -8,16 +10,31 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    provided
+}
+
+sourceSets.main {
+    compileClasspath += configurations.provided
+}
+
+jar {
+    into('META-INF') {
+        from 'META-INF/plugin.xml'
+    }
+}
+
 dependencies {
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     runtime 'org.slf4j:slf4j-simple:1.6.6'
+
+    // IntelliJ plugin runtime libraries
+    provided files('intellij/extensions-ideaIC-122-SNAPSHOT.jar')
+    provided files('intellij/openapi-ideaIC-122-SNAPSHOT.jar')
+    provided files('intellij/util-ideaIC-122-SNAPSHOT.jar')
 }
 
-// enable Gradle Wrapper support for bootstrapping with specific version
-task wrapper(type: Wrapper) {
-    gradleVersion = gradleToolingApiVersion
-}
-
+// ensure our project type is set to IntelliJ plugin
 idea.module {
     jdkName = ideaPluginJdkName
     iml {
@@ -26,6 +43,19 @@ idea.module {
             node.attributes().put('type','PLUGIN_MODULE')
         }
     }
+}
+
+task distPlugin(type: Zip, dependsOn: jar) {
+    description = "Generate the IntelliJ plugin archive from the current project."
+    into('gradle-dependency-ui/lib') {
+        from jar.archivePath
+        from configurations.runtime
+    }
+}
+
+// enable Gradle Wrapper support for bootstrapping with specific version
+task wrapper(type: Wrapper) {
+    gradleVersion = gradleToolingApiVersion
 }
 
 // TODO figure out how to bundle up plugin from Gradle
