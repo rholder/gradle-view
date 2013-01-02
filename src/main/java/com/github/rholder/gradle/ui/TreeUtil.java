@@ -17,7 +17,7 @@ public class TreeUtil {
      * DefaultMutableTreeNode instances suitable for display in a tree
      * structure, returning the given converted dependency that was passed in.
      *
-     * @param dependency
+     * @param dependency the dependency to start from (may also be a root node)
      */
     public static DefaultMutableTreeNode convertToTreeNode(GradleNode dependency) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dependency);
@@ -32,7 +32,7 @@ public class TreeUtil {
      * root where its children are all the de-duplicated nodes from the given
      * dependency node root.
      *
-     * @param root
+     * @param root the root node to start from
      */
     public static DefaultMutableTreeNode convertToSortedTreeNode(GradleNode root) {
         // top level GradleNode instances are actually the configuration strings

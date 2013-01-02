@@ -32,8 +32,8 @@ public class DependencyConversionUtil {
      * Use the Gradle Tooling API to call 'gradle dependencies' on the given path,
      * returning the root node of the dependency graph.
      *
-     * @param projectPath
-     * @param toolingLogger
+     * @param projectPath the path to the target project to load
+     * @param toolingLogger instance to use for Gradle tooling log messages
      */
     public static Map<String, GradleNode> loadProjectDependencies(String projectPath, final ToolingLogger toolingLogger) {
         // TODO find all sub-dir's with build.gradle, run gradle dependencies in each one

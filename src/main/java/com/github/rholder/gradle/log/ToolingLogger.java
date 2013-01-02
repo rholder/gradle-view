@@ -9,7 +9,7 @@ public interface ToolingLogger {
     /**
      * Log the given message.
      *
-     * @param message
+     * @param message the message to be logged
      */
     void log(String message);
 }

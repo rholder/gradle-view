@@ -1,7 +1,7 @@
 package com.github.rholder.gradle.ui;
 
 /**
- * Implementations of this class define behaviours for actions that are
+ * Implementations of this class define behaviors for actions that are
  * coordinated through asynchronous UI bindings.
  */
 public interface ViewActionListener {
