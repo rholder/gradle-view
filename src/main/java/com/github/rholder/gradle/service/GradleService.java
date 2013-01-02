@@ -26,7 +26,7 @@ import static com.github.rholder.gradle.dependency.DependencyConversionUtil.load
  * Instances of this class maintain IntelliJ Project specific service state and
  * manage calls out to the Gradle Tooling API.
  */
-public class GradleService extends AbstractProjectComponent {
+public class GradleService extends AbstractProjectComponent implements GradleServiceListener {
 
     private List<GradleServiceListener> registeredListeners = new ArrayList<GradleServiceListener>();
 
@@ -48,45 +48,5 @@ public class GradleService extends AbstractProjectComponent {
         for(GradleServiceListener r : registeredListeners) {
             r.refresh();
         }
-    }
-
-    public static Map<String, GradleDependency> loadProjectDependencies(String projectPath, final ToolingLogger toolingLogger) {
-        // TODO find all sub-dir's with build.gradle, run gradle dependencies in each one
-        // TODO store cache of computed dependency tree
-        if(projectPath == null) {
-            return Collections.singletonMap("root", new GradleDependency("No Gradle project directory selected..."));
-        }
-
-        ProjectConnection connection = GradleConnector.newConnector()
-                .forProjectDirectory(new File(projectPath))
-                .connect();
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try {
-            BuildLauncher launcher = connection.newBuild().forTasks("dependencies");
-            launcher.setStandardOutput(outputStream);
-            launcher.setStandardError(outputStream);
-            launcher.addProgressListener(new ProgressListener() {
-                public void statusChanged(ProgressEvent event) {
-                    toolingLogger.log(event.getDescription());
-                }
-            });
-
-            launcher.run();
-        } finally {
-            connection.close();
-        }
-
-        Map<String, GradleDependency> dependencyMap = Maps.newHashMap();
-        GradleDependency dependency;
-        try {
-            outputStream.close();
-            dependency = loadDependenciesFromText(new ByteArrayInputStream(outputStream.toByteArray()));
-            dependencyMap.put("root", dependency);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        return dependencyMap;
     }
 }

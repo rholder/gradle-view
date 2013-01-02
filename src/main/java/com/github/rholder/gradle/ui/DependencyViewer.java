@@ -24,13 +24,14 @@ import com.intellij.util.Consumer;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+
+import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependencies;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
+import static com.github.rholder.gradle.ui.TreeUtil.generateSortedDependencies;
 
 public class DependencyViewer extends SimpleToolWindowPanel {
 
@@ -46,20 +47,8 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         this.project = p;
         this.toolWindow = t;
         this.splitter = new Splitter();
-        this.toolingLogger = new ToolingLogger() {
-            public void log(final String line) {
-                // TODO lots of log messages will freeze the dispatch thread, fix this
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        if(gradleBaseDir != null) {
-                            toolWindow.setTitle("- " + gradleBaseDir + " - " + line);
-                        }
-                    }
-                });
-            }
-        };
-        shouldPromptForCurrentProject = true;
-
+        this.toolingLogger = initToolingLogger();
+        this.shouldPromptForCurrentProject = true;
 
         // TODO clean all of this up
         GradleService gradleService = ServiceManager.getService(project, GradleService.class);
@@ -82,7 +71,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
                 new SwingWorker<GradleDependency, Void>() {
                     protected GradleDependency doInBackground() throws Exception {
-                        Map<String, GradleDependency> dependencyMap = GradleService.loadProjectDependencies(gradleBaseDir, toolingLogger);
+                        Map<String, GradleDependency> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
                         GradleDependency root = dependencyMap.get("root");
                         updateView(root);
                         return root;
@@ -106,10 +95,25 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
     }
 
+    private ToolingLogger initToolingLogger() {
+        return new ToolingLogger() {
+            public void log(final String line) {
+                // note: lots of log messages will freeze the dispatch thread
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run() {
+                        if(gradleBaseDir != null) {
+                            toolWindow.setTitle("- " + gradleBaseDir + " - " + line);
+                        }
+                    }
+                });
+            }
+        };
+    }
+
     public void updateView(GradleDependency dependency) {
         // TODO replace this hack with something that populates the GradleDependency graph
 
-        TreeModel leftModel = new DefaultTreeModel(getNode(dependency));
+        TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(dependency));
         final SimpleTree leftTree = new SimpleTree(leftModel);
         leftTree.setCellRenderer(new DependencyCellRenderer());
 
@@ -127,51 +131,6 @@ public class DependencyViewer extends SimpleToolWindowPanel {
             }
         });
     }
-
-    private DefaultMutableTreeNode getNode(GradleDependency dependency) {
-        DefaultMutableTreeNode node = new DefaultMutableTreeNode(dependency);
-        for(GradleDependency d : dependency.dependencies) {
-            node.add(getNode(d));
-        }
-        return node;
-    }
-
-    // --- begin sorted deps
-    private DefaultMutableTreeNode generateSortedDependencies(GradleDependency root) {
-        // top level GradleDependency instances are actually the configuration strings
-        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(root);
-        for(GradleDependency configuration : root.dependencies) {
-            DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
-            rootNode.add(configurationNode);
-
-            // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
-            Set<GradleDependency> childDependencies = getChildrenFromRootNode(configuration);
-            for(GradleDependency d : childDependencies) {
-                if(!d.isOmitted()) {
-                    configurationNode.add(new DefaultMutableTreeNode(d));
-                }
-            }
-        }
-        return rootNode;
-    }
-
-    private Set<GradleDependency> getChildrenFromRootNode(GradleDependency dependency) {
-        Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
-        for(GradleDependency d : dependency.dependencies) {
-            sortedDependencies.addAll(getChildrenNodes(d));
-        }
-        return sortedDependencies;
-    }
-
-    private Set<GradleDependency> getChildrenNodes(GradleDependency dependency) {
-        Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
-        sortedDependencies.add(dependency);
-        for(GradleDependency d : dependency.dependencies) {
-            sortedDependencies.addAll(getChildrenNodes(d));
-        }
-        return sortedDependencies;
-    }
-    // --- end sorted deps
 
     private void promptForGradleBaseDir() {
         FileChooserDescriptor fcd = FileChooserDescriptorFactory.createSingleFolderDescriptor();
@@ -191,7 +150,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
     private int useCurrentProjectBuild() {
         return Messages.showYesNoDialog(
                 "Would you like to view the current project's Gradle dependencies?",
-                "Use this project's Gradle build",
+                "Gradle Dependency Viewer",
                 null);
     }
 }
