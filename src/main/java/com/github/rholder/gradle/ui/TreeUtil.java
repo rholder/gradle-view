@@ -1,11 +1,15 @@
 package com.github.rholder.gradle.ui;
 
-import com.github.rholder.gradle.dependency.GradleDependency;
+import com.github.rholder.gradle.dependency.GradleNode;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.util.Set;
 import java.util.TreeSet;
 
+/**
+ * This is a utility class for working with DefaultMutableTreeNode instances and
+ * converting the GradleNode graph.
+ */
 public class TreeUtil {
 
     /**
@@ -15,9 +19,9 @@ public class TreeUtil {
      *
      * @param dependency
      */
-    public static DefaultMutableTreeNode convertToTreeNode(GradleDependency dependency) {
+    public static DefaultMutableTreeNode convertToTreeNode(GradleNode dependency) {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(dependency);
-        for(GradleDependency d : dependency.dependencies) {
+        for(GradleNode d : dependency.dependencies) {
             node.add(convertToTreeNode(d));
         }
         return node;
@@ -30,16 +34,16 @@ public class TreeUtil {
      *
      * @param root
      */
-    public static DefaultMutableTreeNode convertToSortedTreeNode(GradleDependency root) {
-        // top level GradleDependency instances are actually the configuration strings
+    public static DefaultMutableTreeNode convertToSortedTreeNode(GradleNode root) {
+        // top level GradleNode instances are actually the configuration strings
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(root);
-        for(GradleDependency configuration : root.dependencies) {
+        for(GradleNode configuration : root.dependencies) {
             DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
             rootNode.add(configurationNode);
 
             // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
-            Set<GradleDependency> childDependencies = getChildrenFromRootNode(configuration);
-            for(GradleDependency d : childDependencies) {
+            Set<GradleNode> childDependencies = getChildrenFromRootNode(configuration);
+            for(GradleNode d : childDependencies) {
                 if(!d.isOmitted()) {
                     configurationNode.add(new DefaultMutableTreeNode(d));
                 }
@@ -54,9 +58,9 @@ public class TreeUtil {
      *
      * @param topNode the top dependency node to start from
      */
-    private static Set<GradleDependency> getChildrenFromRootNode(GradleDependency topNode) {
-        Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
-        for(GradleDependency d : topNode.dependencies) {
+    private static Set<GradleNode> getChildrenFromRootNode(GradleNode topNode) {
+        Set<GradleNode> sortedDependencies = new TreeSet<GradleNode>();
+        for(GradleNode d : topNode.dependencies) {
             sortedDependencies.addAll(getChildNodes(d));
         }
         return sortedDependencies;
@@ -68,10 +72,10 @@ public class TreeUtil {
      *
      * @param node the dependency node to gather child nodes from
      */
-    private static Set<GradleDependency> getChildNodes(GradleDependency node) {
-        Set<GradleDependency> sortedDependencies = new TreeSet<GradleDependency>();
+    private static Set<GradleNode> getChildNodes(GradleNode node) {
+        Set<GradleNode> sortedDependencies = new TreeSet<GradleNode>();
         sortedDependencies.add(node);
-        for(GradleDependency d : node.dependencies) {
+        for(GradleNode d : node.dependencies) {
             sortedDependencies.addAll(getChildNodes(d));
         }
         return sortedDependencies;

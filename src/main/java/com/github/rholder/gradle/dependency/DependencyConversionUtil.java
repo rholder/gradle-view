@@ -35,11 +35,11 @@ public class DependencyConversionUtil {
      * @param projectPath
      * @param toolingLogger
      */
-    public static Map<String, GradleDependency> loadProjectDependencies(String projectPath, final ToolingLogger toolingLogger) {
+    public static Map<String, GradleNode> loadProjectDependencies(String projectPath, final ToolingLogger toolingLogger) {
         // TODO find all sub-dir's with build.gradle, run gradle dependencies in each one
         // TODO store cache of computed dependency tree
         if(projectPath == null) {
-            return Collections.singletonMap("root", new GradleDependency("No Gradle project directory selected..."));
+            return Collections.singletonMap("root", new GradleNode("No Gradle project directory selected..."));
         }
 
         ProjectConnection connection = GradleConnector.newConnector()
@@ -62,8 +62,8 @@ public class DependencyConversionUtil {
             connection.close();
         }
 
-        Map<String, GradleDependency> dependencyMap = Maps.newHashMap();
-        GradleDependency dependency;
+        Map<String, GradleNode> dependencyMap = Maps.newHashMap();
+        GradleNode dependency;
         try {
             outputStream.close();
             dependency = loadDependenciesFromText(new ByteArrayInputStream(outputStream.toByteArray()));
@@ -82,18 +82,18 @@ public class DependencyConversionUtil {
      * @param inputStream where output of 'gradle dependencies' can be read
      * @throws IOException
      */
-    public static GradleDependency loadDependenciesFromText(InputStream inputStream) throws IOException {
+    public static GradleNode loadDependenciesFromText(InputStream inputStream) throws IOException {
         List<List<String>> rawDependencies = generateRawDependencies(inputStream);
-        GradleDependency root = new GradleDependency("Project Dependencies");
+        GradleNode root = new GradleNode("Project Dependencies");
         for(List<String> canonicalRawStringList : rawDependencies) {
-            LinkedList<GradleDependency> parentStack = new LinkedList<GradleDependency>();
-            GradleDependency scope = extractDependency(root, canonicalRawStringList.remove(0));
+            LinkedList<GradleNode> parentStack = new LinkedList<GradleNode>();
+            GradleNode scope = extractDependency(root, canonicalRawStringList.remove(0));
             root.dependencies.add(scope);
             parentStack.addFirst(scope);
             for(String rawDependency : canonicalRawStringList) {
 
                 // here we have XXX group:id:version -> replaced_version (*)
-                GradleDependency dependency = extractDependency(null, rawDependency);
+                GradleNode dependency = extractDependency(null, rawDependency);
                 if(parentStack.getFirst().level == dependency.level) {
                     processSibling(parentStack, dependency);
                 } else if(parentStack.getFirst().level < dependency.level) {
@@ -169,25 +169,25 @@ public class DependencyConversionUtil {
     }
 
     /**
-     * Parse a raw dependency String into a GradleDependency, setting its
-     * parent to the given value.  The raw String would look something like this:
+     * Parse a raw dependency String into a GradleNode, setting its parent to
+     * the given value. The raw String would look something like this:
      *
      * XX org.apache.httpcomponents:httpclient:[4.1, 5.0) -> 4.2.1
      *
      * @param parent parent node of this nested dependency
      * @param rawDependency semi-processed raw line output
      */
-    private static GradleDependency extractDependency(GradleDependency parent, String rawDependency) {
+    private static GradleNode extractDependency(GradleNode parent, String rawDependency) {
         String[] nameArray = rawDependency.split(" ");
         String name = flattenName(nameArray);
 
         String[] splitValues = name.split(":");
-        GradleDependency dependency;
+        GradleNode dependency;
         if(splitValues.length < 3) {
-            dependency = new GradleDependency(rawDependency);
+            dependency = new GradleNode(rawDependency);
         } else {
             String version = splitValues[2].trim();
-            dependency = new GradleDependency(parent, splitValues[0], splitValues[1], version);
+            dependency = new GradleNode(parent, splitValues[0], splitValues[1], version);
             if(name.contains("(*)")) {
                 version = version.replace("(*)", "").trim();
                 dependency.omitted = true;
@@ -246,7 +246,7 @@ public class DependencyConversionUtil {
      * @param parentStack current parent stack
      * @param dependency child dependency node to process
      */
-    private static void processChild(LinkedList<GradleDependency> parentStack, GradleDependency dependency) {
+    private static void processChild(LinkedList<GradleNode> parentStack, GradleNode dependency) {
         // add child dependency
         parentStack.getFirst().dependencies.add(dependency);
         dependency.parent = parentStack.getFirst();
@@ -260,9 +260,9 @@ public class DependencyConversionUtil {
      * @param parentStack current parent stack
      * @param dependency sibling dependency node to process
      */
-    private static void processSibling(LinkedList<GradleDependency> parentStack, GradleDependency dependency) {
+    private static void processSibling(LinkedList<GradleNode> parentStack, GradleNode dependency) {
         // sibling dependency, so they share a parent
-        GradleDependency sibling = parentStack.removeFirst();
+        GradleNode sibling = parentStack.removeFirst();
         sibling.parent.dependencies.add(dependency);
         dependency.parent = sibling.parent;
 

@@ -1,6 +1,6 @@
 package com.github.rholder.gradle.ui;
 
-import com.github.rholder.gradle.dependency.GradleDependency;
+import com.github.rholder.gradle.dependency.GradleNode;
 import com.github.rholder.gradle.log.ToolingLogger;
 import com.github.rholder.gradle.intellij.GradleService;
 import com.intellij.openapi.actionSystem.ActionManager;
@@ -65,12 +65,12 @@ public class DependencyViewer extends SimpleToolWindowPanel {
                     promptForGradleBaseDir();
                 }
 
-                updateView(new GradleDependency("Loading..."));
+                updateView(new GradleNode("Loading..."));
 
-                new SwingWorker<GradleDependency, Void>() {
-                    protected GradleDependency doInBackground() throws Exception {
-                        Map<String, GradleDependency> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
-                        GradleDependency root = dependencyMap.get("root");
+                new SwingWorker<GradleNode, Void>() {
+                    protected GradleNode doInBackground() throws Exception {
+                        Map<String, GradleNode> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
+                        GradleNode root = dependencyMap.get("root");
                         updateView(root);
                         return root;
                     }
@@ -108,8 +108,8 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         };
     }
 
-    public void updateView(GradleDependency dependency) {
-        // TODO replace this hack with something that populates the GradleDependency graph
+    public void updateView(GradleNode dependency) {
+        // TODO replace this hack with something that populates the GradleNode graph
 
         TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(dependency));
         final SimpleTree leftTree = new SimpleTree(leftModel);

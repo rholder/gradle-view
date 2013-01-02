@@ -1,6 +1,6 @@
 package com.github.rholder.gradle.ui;
 
-import com.github.rholder.gradle.dependency.GradleDependency;
+import com.github.rholder.gradle.dependency.GradleNode;
 
 import javax.swing.JLabel;
 import javax.swing.JTree;
@@ -11,9 +11,9 @@ import java.awt.Component;
 
 /**
  * Add some text highlighting and other visual indicators to the view of
- * GradleDependency nodes in the tree depending on whether they've been replaced
- * by another dependency or omitted because they've been included elsewhere up
- * the tree.
+ * GradleNode nodes in the tree depending on whether they've been replaced by
+ * another dependency or omitted because they've been included elsewhere up the
+ * tree.
  */
 public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
 
@@ -24,7 +24,7 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
                                                   boolean leaf,
                                                   int row,
                                                   boolean hasFocus) {
-        GradleDependency gradleDependency = (GradleDependency) ((DefaultMutableTreeNode) value).getUserObject();
+        GradleNode gradleDependency = (GradleNode) ((DefaultMutableTreeNode) value).getUserObject();
         String text = gradleDependency.getName();
 
         if(gradleDependency.isReplaced()) {

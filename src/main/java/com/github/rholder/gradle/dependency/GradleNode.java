@@ -3,19 +3,18 @@ package com.github.rholder.gradle.dependency;
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO rename to GradleNode
 /**
- * A GradleDependency encapsulates all the data needed to render a viewable
- * tree representation. A non-dependency node does not refer to a specific
- * dependency but instead can represent the root node or a configuration entry
- * (such as compile or runtime).
+ * A GradleNode encapsulates all the data needed to render a viewable tree
+ * representation. A non-dependency node does not refer to a specific dependency
+ * but instead can represent the root node or a configuration entry (such as
+ * compile or runtime).
  */
-public class GradleDependency implements Comparable<GradleDependency> {
+public class GradleNode implements Comparable<GradleNode> {
 
     // name is filled in by configuration type nodes
     public String name;
 
-    public GradleDependency parent;
+    public GradleNode parent;
     public String group;
     public String id;
     public String version;
@@ -27,14 +26,14 @@ public class GradleDependency implements Comparable<GradleDependency> {
     public String replacedByVersion = null;
 
     // child dependencies
-    public List<GradleDependency> dependencies = new ArrayList<GradleDependency>();
+    public List<GradleNode> dependencies = new ArrayList<GradleNode>();
 
     /**
      * Construct a non-dependency parent or root node.
      *
      * @param name name for this parent or root node
      */
-    public GradleDependency(String name) {
+    public GradleNode(String name) {
         this.name = name;
         this.parent = null;
         this.level = 0;
@@ -48,7 +47,7 @@ public class GradleDependency implements Comparable<GradleDependency> {
      * @param id the id to set for this node
      * @param version the version to set for this node
      */
-    public GradleDependency(GradleDependency parent, String group, String id, String version) {
+    public GradleNode(GradleNode parent, String group, String id, String version) {
         this.parent = parent;
         this.group = group;
         this.id = id;
@@ -89,7 +88,7 @@ public class GradleDependency implements Comparable<GradleDependency> {
         }
         String parentName = parent != null ? parent.getName() : "";
         b.append("name = " + getName() + ", level = " + level + ", parent = " + parentName);
-        for(GradleDependency d : dependencies) {
+        for(GradleNode d : dependencies) {
             b.append("\n");
             b.append(d);
         }
@@ -106,7 +105,7 @@ public class GradleDependency implements Comparable<GradleDependency> {
      *
      * @param o the other instance to compare against
      */
-    public int compareTo(GradleDependency o) {
+    public int compareTo(GradleNode o) {
         return getName().compareTo(o.getName());
     }
 }
