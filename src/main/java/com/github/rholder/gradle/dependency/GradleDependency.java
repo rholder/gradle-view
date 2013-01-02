@@ -79,8 +79,10 @@ public class GradleDependency implements Comparable<GradleDependency> {
         return replacedByVersion != null;
     }
 
-    @Override
-    public String toString() {
+    /**
+     * Return the full traceback of everything in this instance.
+     */
+    public String toFullString() {
         StringBuilder b = new StringBuilder();
         for(int i = 0; i < level; i++) {
             b.append("    ");
@@ -94,6 +96,16 @@ public class GradleDependency implements Comparable<GradleDependency> {
         return b.toString();
     }
 
+    @Override
+    public String toString() {
+        return getName();
+    }
+
+    /**
+     * Return the String comparison based on the return value of getName().
+     *
+     * @param o the other instance to compare against
+     */
     public int compareTo(GradleDependency o) {
         return getName().compareTo(o.getName());
     }
