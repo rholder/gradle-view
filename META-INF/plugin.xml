@@ -1,7 +1,7 @@
 <idea-plugin version="2">
     <name>Gradle View</name>
     <description>Show a split tree rollup of the dependencies for each Gradle configuration in use by a project.</description>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <vendor>rholder</vendor>
 
     <idea-version since-build="107.105"/>
