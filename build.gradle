@@ -1,8 +1,18 @@
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'gradle-one-jar'
 
 group = 'com.github.rholder'
 version = '1.0.1-SNAPSHOT'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.github.rholder:gradle-one-jar:1.0.1'
+    }
+}
 
 repositories {
     maven {
@@ -28,12 +38,13 @@ jar {
 
 dependencies {
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
-    runtime 'org.slf4j:slf4j-simple:1.6.6'
+    compile 'com.google.guava:guava:11.0.2'
+    runtime 'org.slf4j:slf4j-simple:1.7.2'
 
     // IntelliJ plugin runtime libraries, since they're not available from a convenient repo
-    provided files('intellij/extensions-ideaIC-122-SNAPSHOT.jar')
-    provided files('intellij/openapi-ideaIC-122-SNAPSHOT.jar')
-    provided files('intellij/util-ideaIC-122-SNAPSHOT.jar')
+    provided files('intellij/extensions-130-SNAPSHOT.jar')
+    provided files('intellij/openapi-130-SNAPSHOT.jar')
+    provided files('intellij/util-130-SNAPSHOT.jar')
 }
 
 // ensure our project type is set to IntelliJ plugin
@@ -53,6 +64,10 @@ task distPlugin(type: Zip, dependsOn: jar) {
         from jar.archivePath
         from configurations.runtime
     }
+}
+
+task distStandalone(type: OneJar) {
+    mainClass = 'com.github.rholder.gradle.ui.DependencyViewerStandalone'
 }
 
 // enable Gradle Wrapper support for bootstrapping with specific version
