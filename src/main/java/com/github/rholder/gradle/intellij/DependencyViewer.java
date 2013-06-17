@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package com.github.rholder.gradle.ui;
+package com.github.rholder.gradle.intellij;
 
 import com.github.rholder.gradle.dependency.GradleNode;
 import com.github.rholder.gradle.log.ToolingLogger;
-import com.github.rholder.gradle.intellij.GradleService;
+import com.github.rholder.gradle.ui.DependencyCellRenderer;
+import com.github.rholder.gradle.ui.ViewActionListener;
 import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.ActionToolbar;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
@@ -44,8 +45,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependencies;
-import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
 
 public class DependencyViewer extends SimpleToolWindowPanel {
 
