@@ -33,6 +33,8 @@ import java.awt.Component;
  */
 public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
 
+    public boolean showReplaced = true;
+
     public Component getTreeCellRendererComponent(JTree tree,
                                                   Object value,
                                                   boolean selected,
@@ -41,10 +43,11 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
                                                   int row,
                                                   boolean hasFocus) {
         GradleNode gradleDependency = (GradleNode) ((DefaultMutableTreeNode) value).getUserObject();
-        String text = gradleDependency.getName();
-
-        if(gradleDependency.isReplaced()) {
-            text += " -> " + gradleDependency.replacedByVersion;
+        String text;
+        if(showReplaced) {
+            text = gradleDependency.getFullName();
+        } else {
+            text = gradleDependency.getName();
         }
 
         if(gradleDependency.isOmitted()) {

@@ -54,6 +54,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
     private final ToolWindow toolWindow;
     private final Splitter splitter;
     private final ToolingLogger toolingLogger;
+    private final DependencyCellRenderer dependencyCellRenderer;
     private String gradleBaseDir;
     private boolean shouldPromptForCurrentProject;
 
@@ -63,11 +64,13 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         this.toolWindow = t;
         this.splitter = new Splitter();
         this.toolingLogger = initToolingLogger();
+        this.dependencyCellRenderer = new DependencyCellRenderer();
         this.shouldPromptForCurrentProject = true;
 
         // TODO clean all of this up
         GradleService gradleService = ServiceManager.getService(project, GradleService.class);
         gradleService.addListener(new ViewActionListener() {
+            @Override
             public void refresh() {
                 if(shouldPromptForCurrentProject) {
                     switch(useCurrentProjectBuild()) {
@@ -93,6 +96,20 @@ public class DependencyViewer extends SimpleToolWindowPanel {
                     }
                 }.execute();
             }
+
+            @Override
+            public void toggleShowReplaced() {
+                dependencyCellRenderer.showReplaced = !dependencyCellRenderer.showReplaced;
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        splitter.repaint();
+                        splitter.validate();
+                    }
+                });
+            }
+
+            @Override
             public void reset() {
                 gradleBaseDir = null;
                 refresh();
@@ -130,11 +147,11 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
         TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(dependency));
         final SimpleTree leftTree = new SimpleTree(leftModel);
-        leftTree.setCellRenderer(new DependencyCellRenderer());
+        leftTree.setCellRenderer(dependencyCellRenderer);
 
         TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(dependency));
         final SimpleTree rightTree = new SimpleTree(rightModel);
-        rightTree.setCellRenderer(new DependencyCellRenderer());
+        rightTree.setCellRenderer(dependencyCellRenderer);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {

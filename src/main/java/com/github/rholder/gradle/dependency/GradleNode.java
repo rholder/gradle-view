@@ -75,7 +75,24 @@ public class GradleNode implements Comparable<GradleNode> {
      * group:id:version of a dependency node.
      */
     public String getName() {
-        return name == null ? group + ":" + id + ":" + version : name;
+        return name == null ? group + ":" + id + ":" + getFinalVersion() : name;
+    }
+
+    /**
+     * Return the name of a non-dependency node or the canonical
+     * group:id:version of a dependency node with an -> if the version is being
+     * replaced by another version.
+     */
+    public String getFullName() {
+        return name == null ? group + ":" + id + ":" + version + (isReplaced() ? " -> " + replacedByVersion : "") : name;
+    }
+
+    /**
+     * Return the actual version or the replacedByVersion if this dependency was
+     * replaced by another version.
+     */
+    public String getFinalVersion() {
+        return isReplaced() ? replacedByVersion : version;
     }
 
     /**

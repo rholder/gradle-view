@@ -50,4 +50,10 @@ public class GradleService extends AbstractProjectComponent {
             r.refresh();
         }
     }
+
+    public void toggleShowReplaced() {
+        for(ViewActionListener r : registeredListeners) {
+            r.toggleShowReplaced();
+        }
+    }
 }

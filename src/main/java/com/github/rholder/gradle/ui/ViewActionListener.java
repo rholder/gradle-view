@@ -31,4 +31,9 @@ public interface ViewActionListener {
      * Perform the refresh action on the Gradle dependency view.
      */
     void refresh();
+
+    /**
+     * Toggle whether or not to show replaced dependencies.
+     */
+    void toggleShowReplaced();
 }
