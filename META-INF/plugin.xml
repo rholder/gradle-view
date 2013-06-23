@@ -28,6 +28,11 @@
                     text="Load"
                     description="Load the Gradle view from another project"
                     icon="/actions/menu-open.png"/>
+            <action id="GradleView.ToggleShowReplace"
+                    class="com.github.rholder.gradle.intellij.ToggleShowReplacedAction"
+                    text="Show/Hide Replaced Dependencies"
+                    description="Show or hide replaced dependencies"
+                    icon="/toolbar/filterdups.png"/>
         </group>
 
     </actions>
