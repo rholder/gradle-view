@@ -84,7 +84,8 @@ public class DependencyConversionUtil {
             outputStream.close();
             dependency = loadDependenciesFromText(new ByteArrayInputStream(outputStream.toByteArray()));
             dependencyMap.put("root", dependency);
-        } catch (IOException e) {
+        } catch (Throwable e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
 
@@ -132,6 +133,11 @@ public class DependencyConversionUtil {
         return root;
     }
 
+    public GradleNode loadDependencyInsight(String group, String name) {
+        //TODO gradle dependencyInsight --dependency org.slf4j:slf4j-api
+        return null;
+    }
+
     /**
      * Return a list of a list of each configuration's dependency lines.  Each
      * Gradle configuration will have its own separate list of all the lines
@@ -155,7 +161,8 @@ public class DependencyConversionUtil {
                     // detect the beginning of a set of dependencies for a given
                     // configuration as the first line beginning with a + when not
                     // inside a dependency tree listing
-                    if(line.startsWith("+")) {
+
+                    if (line.startsWith("+") || line.startsWith("\\")) {
 
                         // collect raw, flattened out dependency entries here
                         canonicalRawStrings = new ArrayList<String>();
@@ -166,6 +173,16 @@ public class DependencyConversionUtil {
                         canonicalRawStrings.add(flatten(line));
                         rawDependencies.add(canonicalRawStrings);
                         inDependencyTree = true;
+
+                    } else if (line.startsWith("No dependencies")) {
+                        // previous line will be an empty configuration
+                        // i.e. archives - Configuration for archive artifacts.
+                        List<String> emptyCanonicalRawStrings = new ArrayList<String>();
+                        emptyCanonicalRawStrings.add(previousLine);
+                        rawDependencies.add(emptyCanonicalRawStrings);
+
+                        // bail out of the dependency loop since it's empty
+                        inDependencyTree = false;
                     } else {
                         previousLine = line;
                     }
@@ -232,10 +249,14 @@ public class DependencyConversionUtil {
      */
     private static String flattenName(String[] nameArray) {
         StringBuilder name = new StringBuilder();
-        name.append(nameArray[1]);
-        for(int i = 2; i < nameArray.length; i++) {
-            name.append(" ");
-            name.append(nameArray[i]);
+        if(nameArray.length > 1) {
+            name.append(nameArray[1]);
+            for(int i = 2; i < nameArray.length; i++) {
+                name.append(" ");
+                name.append(nameArray[i]);
+            }
+        } else {
+            name.append(nameArray[0]);
         }
         return name.toString();
     }
