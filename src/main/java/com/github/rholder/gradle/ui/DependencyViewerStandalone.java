@@ -116,7 +116,7 @@ public class DependencyViewerStandalone extends JFrame {
 
                     // TODO wire in loadDependencyInsight task when it's working
                     /*
-                    GradleNode target = dependencyCellRenderer.getSelected();
+                    GradleNode target = dependencyCellRenderer.selectedGradleNode;
                     GradleNode dependency;
                     if(target != null && target.group != null) {
                         Map<String, GradleNode> dependencyInsightMap = loadDependencyInsight(gradleBaseDir, toolingLogger, target.group, target.id);

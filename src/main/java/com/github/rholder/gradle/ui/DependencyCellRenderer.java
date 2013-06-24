@@ -37,6 +37,11 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
 
     public GradleNode selectedGradleNode;
 
+    public Color omittedSelected = Color.MAGENTA;
+    public Color omittedUnselected = Color.LIGHT_GRAY;
+    public Color normalSelected = Color.RED;
+    public Color normalUnselected = Color.BLACK;
+
     public Component getTreeCellRendererComponent(JTree tree,
                                                   Object value,
                                                   boolean selected,
@@ -45,17 +50,12 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
                                                   int row,
                                                   boolean hasFocus) {
         GradleNode gradleDependency = (GradleNode) ((DefaultMutableTreeNode) value).getUserObject();
-        String text;
-        if(showReplaced) {
-            text = gradleDependency.getFullName();
-        } else {
-            text = gradleDependency.getName();
-        }
+        String text = showReplaced ? gradleDependency.getFullName() : gradleDependency.getName();
 
         if(gradleDependency.isOmitted()) {
-            setForeground(selected ? Color.MAGENTA : Color.LIGHT_GRAY);
+            setForeground(selected ? omittedSelected : omittedUnselected);
         } else {
-            setForeground(selected ? Color.RED : Color.BLACK);
+            setForeground(selected ? normalSelected : normalUnselected);
         }
 
         if(selected) {
@@ -64,12 +64,5 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
 
         setText(text);
         return this;
-    }
-
-    /**
-     * Return the selected GradleNode or null if none has been set.
-     */
-    public GradleNode getSelected() {
-        return selectedGradleNode;
     }
 }

@@ -33,6 +33,7 @@ import com.intellij.openapi.ui.SimpleToolWindowPanel;
 import com.intellij.openapi.ui.Splitter;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.wm.ToolWindow;
+import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.Consumer;
@@ -64,7 +65,13 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         this.toolWindow = t;
         this.splitter = new Splitter();
         this.toolingLogger = initToolingLogger();
+
         this.dependencyCellRenderer = new DependencyCellRenderer();
+        this.dependencyCellRenderer.omittedSelected = JBColor.MAGENTA;
+        this.dependencyCellRenderer.omittedUnselected = JBColor.LIGHT_GRAY;
+        this.dependencyCellRenderer.normalSelected = JBColor.RED;
+        this.dependencyCellRenderer.normalUnselected = JBColor.BLACK;
+
         this.shouldPromptForCurrentProject = true;
 
         // TODO clean all of this up
