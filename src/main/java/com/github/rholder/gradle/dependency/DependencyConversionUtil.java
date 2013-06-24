@@ -133,8 +133,19 @@ public class DependencyConversionUtil {
         return root;
     }
 
-    public GradleNode loadDependencyInsight(String group, String name) {
-        //TODO gradle dependencyInsight --dependency org.slf4j:slf4j-api
+    /**
+     * Use the Gradle Tooling API to call 'gradle dependencyInsight --dependency
+     * group:name' on the given path, returning the root node of the collection
+     * of dependency graphs.
+     *
+     * @param projectPath the path to the target project to load
+     * @param toolingLogger instance to use for Gradle tooling log messages
+     * @param group dependency group to match
+     * @param name dependency name to match
+     */
+    public static Map<String, GradleNode> loadDependencyInsight(String projectPath, final ToolingLogger toolingLogger, String group, String name) {
+        //TODO gradle dependencyInsight --dependency org.slf4j:slf4j-api, we can't directly pass these parameters though :(
+
         return null;
     }
 
@@ -157,6 +168,7 @@ public class DependencyConversionUtil {
             List<String> canonicalRawStrings = null;
             boolean inDependencyTree = false;
             while((line = reader.readLine()) != null) {
+                System.out.println(line);
                 if(!inDependencyTree) {
                     // detect the beginning of a set of dependencies for a given
                     // configuration as the first line beginning with a + when not
@@ -232,7 +244,6 @@ public class DependencyConversionUtil {
                     String[] replaceSplit = version.split("->");
                     version = replaceSplit[0].trim();
                     dependency.replacedByVersion = replaceSplit[1].trim();
-                    // TODO add mapping to track which dep actually caused replacement
                 }
             }
             dependency.version = version;

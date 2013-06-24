@@ -35,6 +35,8 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
 
     public boolean showReplaced = true;
 
+    public GradleNode selectedGradleNode;
+
     public Component getTreeCellRendererComponent(JTree tree,
                                                   Object value,
                                                   boolean selected,
@@ -55,7 +57,19 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
         } else {
             setForeground(selected ? Color.RED : Color.BLACK);
         }
+
+        if(selected) {
+            this.selectedGradleNode = gradleDependency;
+        }
+
         setText(text);
         return this;
+    }
+
+    /**
+     * Return the selected GradleNode or null if none has been set.
+     */
+    public GradleNode getSelected() {
+        return selectedGradleNode;
     }
 }

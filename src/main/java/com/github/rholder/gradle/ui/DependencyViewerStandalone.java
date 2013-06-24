@@ -47,12 +47,15 @@ public class DependencyViewerStandalone extends JFrame {
 
     private static final String TITLE = "Gradle Dependency Viewer";
 
+    private final DependencyCellRenderer dependencyCellRenderer;
+
     private String gradleBaseDir;
     private JSplitPane splitter;
     private ToolingLogger toolingLogger;
 
     public DependencyViewerStandalone() {
         super(TITLE);
+        this.dependencyCellRenderer = new DependencyCellRenderer();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(1024, 768);
@@ -103,14 +106,28 @@ public class DependencyViewerStandalone extends JFrame {
 
     private void refresh() {
         if(gradleBaseDir != null) {
-            updateView(new GradleNode("Loading..."));
+            updateView(new GradleNode("Loading..."), new GradleNode("No dependency selected"));
 
-            new SwingWorker<GradleNode, Void>() {
-                protected GradleNode doInBackground() throws Exception {
+            new SwingWorker<Void, Void>() {
+                protected Void doInBackground() throws Exception {
+
                     Map<String, GradleNode> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
-                    GradleNode root = dependencyMap.get("root");
-                    updateView(root);
-                    return root;
+                    GradleNode tree = dependencyMap.get("root");
+
+                    // TODO wire in loadDependencyInsight task when it's working
+                    /*
+                    GradleNode target = dependencyCellRenderer.getSelected();
+                    GradleNode dependency;
+                    if(target != null && target.group != null) {
+                        Map<String, GradleNode> dependencyInsightMap = loadDependencyInsight(gradleBaseDir, toolingLogger, target.group, target.id);
+                        dependency = dependencyInsightMap.get("root");
+                    } else {
+                        dependency = new GradleNode("No dependency selected");
+                    }
+                    */
+
+                    updateView(tree, null);
+                    return null;
                 }
             }.execute();
         }
@@ -151,16 +168,16 @@ public class DependencyViewerStandalone extends JFrame {
         }
     }
 
-    public void updateView(GradleNode dependency) {
+    public void updateView(GradleNode tree, GradleNode dependency) {
         // TODO replace this hack with something that populates the GradleNode graph
 
-        TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(dependency));
+        TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(tree));
         final JTree leftTree = new JTree(leftModel);
-        leftTree.setCellRenderer(new DependencyCellRenderer());
+        leftTree.setCellRenderer(dependencyCellRenderer);
 
-        TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(dependency));
+        TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(tree));
         final JTree rightTree = new JTree(rightModel);
-        rightTree.setCellRenderer(new DependencyCellRenderer());
+        rightTree.setCellRenderer(dependencyCellRenderer);
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
