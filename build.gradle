@@ -6,14 +6,14 @@ sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
 group = 'com.github.rholder'
-version = '1.0.1'
+version = '1.0.2-SNAPSHOT'
 
 buildscript {
     repositories {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.github.rholder:gradle-one-jar:1.0.1'
+        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
     }
 }
 
@@ -42,12 +42,13 @@ jar {
 dependencies {
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     compile 'com.google.guava:guava:11.0.2'
+    //compile 'com.github.rholder:gradle-insight:0.1.0-SNAPSHOT'
     runtime 'org.slf4j:slf4j-simple:1.7.2'
 
     // IntelliJ plugin runtime libraries, since they're not available from a convenient repo
-    provided files('intellij/extensions-130-SNAPSHOT.jar')
-    provided files('intellij/openapi-130-SNAPSHOT.jar')
-    provided files('intellij/util-130-SNAPSHOT.jar')
+    provided files('intellij/extensions-135.690.jar')
+    provided files('intellij/openapi-135.690.jar')
+    provided files('intellij/util-135.690.jar')
 }
 
 // ensure our project type is set to IntelliJ plugin
