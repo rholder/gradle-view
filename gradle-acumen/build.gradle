@@ -1,0 +1,29 @@
+apply plugin: 'groovy'
+apply plugin: 'maven-publish'
+apply plugin: 'idea'
+
+group = 'com.github.rholder'
+version = '0.1.0'
+
+dependencies {
+    compile gradleApi()
+}
+
+task sourceJar(type: Jar) {
+      description "An archive of the source code for Maven Central"
+      classifier "sources"
+      from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
+}
+
