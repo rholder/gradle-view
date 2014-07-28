@@ -39,7 +39,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.Map;
 
-import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependencies;
+import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependenciesFromModel;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
 
@@ -111,7 +111,7 @@ public class DependencyViewerStandalone extends JFrame {
             new SwingWorker<Void, Void>() {
                 protected Void doInBackground() throws Exception {
 
-                    Map<String, GradleNode> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
+                    Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
                     GradleNode tree = dependencyMap.get("root");
 
                     // TODO wire in loadDependencyInsight task when it's working

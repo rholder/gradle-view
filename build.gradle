@@ -40,9 +40,11 @@ jar {
 }
 
 dependencies {
+    compile project(':gradle-acumen')
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     compile 'com.google.guava:guava:11.0.2'
-    //compile 'com.github.rholder:gradle-insight:0.1.0-SNAPSHOT'
+    compile 'commons-io:commons-io:2.2'
+
     runtime 'org.slf4j:slf4j-simple:1.7.2'
 
     // IntelliJ plugin runtime libraries, since they're not available from a convenient repo

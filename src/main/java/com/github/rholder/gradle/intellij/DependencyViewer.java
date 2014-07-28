@@ -45,7 +45,7 @@ import javax.swing.tree.TreeModel;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependencies;
+import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependenciesFromModel;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
 
@@ -96,7 +96,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
                 new SwingWorker<GradleNode, Void>() {
                     protected GradleNode doInBackground() throws Exception {
-                        Map<String, GradleNode> dependencyMap = loadProjectDependencies(gradleBaseDir, toolingLogger);
+                        Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
                         GradleNode root = dependencyMap.get("root");
                         updateView(root);
                         return root;

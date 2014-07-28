@@ -1,0 +1,9 @@
+initscript {
+    dependencies {
+        classpath files('#ACUMEN_JAR#')
+    }
+}
+
+allprojects {
+    apply plugin: com.github.rholder.gradle.acumen.GradleAcumenPlugin
+}
