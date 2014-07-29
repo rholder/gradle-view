@@ -37,6 +37,10 @@ jar {
         from 'META-INF/plugin.xml'
         from 'LICENSE'
     }
+    into('') {
+        // well this is wonky...
+        from 'gradle-acumen/build/libs/gradle-acumen-0.1.0.jar'
+    }
 }
 
 dependencies {
