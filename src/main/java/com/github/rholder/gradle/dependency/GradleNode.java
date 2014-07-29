@@ -35,9 +35,6 @@ public class GradleNode implements Comparable<GradleNode> {
     public String id;
     public String version;
 
-    // used for internal tracking of how deep a node is within the tree
-    public int level;
-
     public boolean omitted = false;
     public String replacedByVersion = null;
 
@@ -52,7 +49,6 @@ public class GradleNode implements Comparable<GradleNode> {
     public GradleNode(String name) {
         this.name = name;
         this.parent = null;
-        this.level = 0;
     }
 
     /**
@@ -116,11 +112,8 @@ public class GradleNode implements Comparable<GradleNode> {
      */
     public String toFullString() {
         StringBuilder b = new StringBuilder();
-        for(int i = 0; i < level; i++) {
-            b.append("    ");
-        }
         String parentName = parent != null ? parent.getName() : "";
-        b.append("name = " + getName() + ", level = " + level + ", parent = " + parentName);
+        b.append("name = " + getName() + ", parent = " + parentName);
         for(GradleNode d : dependencies) {
             b.append("\n");
             b.append(d);
