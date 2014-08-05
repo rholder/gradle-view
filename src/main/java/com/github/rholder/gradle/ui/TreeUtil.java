@@ -54,15 +54,21 @@ public class TreeUtil {
         // top level GradleNode instances are actually the configuration strings
         GradleNode sortedNode = new GradleNode("Flattened Project Dependencies");
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(sortedNode);
-        for(GradleNode configuration : root.dependencies) {
-            DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
-            rootNode.add(configurationNode);
+        for(GradleNode module : root.dependencies) {
 
-            // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
-            Set<GradleNode> childDependencies = getChildrenFromRootNode(configuration);
-            for(GradleNode d : childDependencies) {
-                if(!d.isOmitted()) {
-                    configurationNode.add(new DefaultMutableTreeNode(d));
+            DefaultMutableTreeNode moduleNode = new DefaultMutableTreeNode(module);
+            rootNode.add(moduleNode);
+
+            for(GradleNode configuration : module.dependencies) {
+                DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
+                moduleNode.add(configurationNode);
+
+                // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
+                Set<GradleNode> childDependencies = getChildrenFromRootNode(configuration);
+                for(GradleNode d : childDependencies) {
+                    if(!d.isOmitted() && d.parent != null) {
+                        configurationNode.add(new DefaultMutableTreeNode(d));
+                    }
                 }
             }
         }
