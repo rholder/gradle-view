@@ -26,6 +26,9 @@ repositories {
 
 configurations {
     provided
+    runtime {
+        transitive = false
+    }
 }
 
 sourceSets.main {
@@ -44,7 +47,6 @@ jar {
 }
 
 dependencies {
-    compile project(':gradle-acumen')
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     compile 'com.google.guava:guava:11.0.2'
     compile 'commons-io:commons-io:2.2'
@@ -55,6 +57,11 @@ dependencies {
     provided files('intellij/extensions-135.690.jar')
     provided files('intellij/openapi-135.690.jar')
     provided files('intellij/util-135.690.jar')
+
+    // just need the project jar
+    compile project(':gradle-acumen') {
+        transitive = false
+    }
 }
 
 // ensure our project type is set to IntelliJ plugin
