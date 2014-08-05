@@ -36,7 +36,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.Collections;
 import java.util.Map;
 
@@ -74,13 +73,24 @@ public class DependencyConversionUtil {
                 }
             });
 
+            // TODO this needs to be cached
+
             // extract from classpath
             File initAcumenFile = File.createTempFile("init-acumen", ".gradle");
             initAcumenFile.deleteOnExit();
 
-            // TODO extract gradle-acumen.jar from classpath
-            File fakeExtractedJarFile = new File(System.getProperty("gradle.view.debug.acumen.jar"));
-            acumenTemplateFromClasspath(fakeExtractedJarFile, initAcumenFile);
+            // use a custom plugin, if this value is set
+            File extractedJarFile;
+            String devGradleAcumen = System.getProperty("gradle.view.debug.acumen.jar");
+            if(devGradleAcumen == null) {
+                extractedJarFile = File.createTempFile("gradle-acumen", "jar");
+                extractedJarFile.deleteOnExit();
+                dumpFromClasspath("/gradle-acumen-0.1.0.jar", extractedJarFile);
+            } else {
+                extractedJarFile = new File(devGradleAcumen);
+            }
+
+            acumenTemplateFromClasspath(extractedJarFile, initAcumenFile);
 
             b.withArguments("--init-script", initAcumenFile.getAbsolutePath());
             atm = b.run();
