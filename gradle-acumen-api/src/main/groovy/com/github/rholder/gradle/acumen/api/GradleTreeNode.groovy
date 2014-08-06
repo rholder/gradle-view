@@ -1,4 +1,4 @@
-package com.github.rholder.gradle.acumen
+package com.github.rholder.gradle.acumen.api
 
 interface GradleTreeNode {
 

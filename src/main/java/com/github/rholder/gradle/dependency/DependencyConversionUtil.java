@@ -16,11 +16,12 @@
 
 package com.github.rholder.gradle.dependency;
 
-import com.github.rholder.gradle.acumen.AcumenTreeModel;
-import com.github.rholder.gradle.acumen.GradleTreeNode;
+import com.github.rholder.gradle.acumen.api.AcumenTreeModel;
+import com.github.rholder.gradle.acumen.api.GradleTreeNode;
 import com.github.rholder.gradle.log.ToolingLogger;
 import com.google.common.collect.Maps;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.gradle.tooling.BuildAction;
 import org.gradle.tooling.BuildActionExecuter;
 import org.gradle.tooling.BuildController;
@@ -98,8 +99,7 @@ public class DependencyConversionUtil {
             GradleNode rootNode = convertToGradleNode(atm);
             dependencyMap.put("root", rootNode);
         } catch (Exception e) {
-            // TODO add errors to toolingLogger
-            e.printStackTrace();
+            toolingLogger.log(ExceptionUtils.getFullStackTrace(e));
             throw new RuntimeException(e);
         } finally {
             connection.close();

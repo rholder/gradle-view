@@ -1,5 +1,7 @@
 package com.github.rholder.gradle.acumen
 
+import com.github.rholder.gradle.acumen.api.GradleTreeNode
+
 class DefaultGradleTreeNode implements GradleTreeNode, Serializable {
 
     String name

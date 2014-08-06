@@ -1,5 +1,6 @@
 package com.github.rholder.gradle.acumen
 
+import com.github.rholder.gradle.acumen.api.AcumenTreeModel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration

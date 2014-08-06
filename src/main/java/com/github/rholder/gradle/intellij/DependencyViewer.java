@@ -37,6 +37,7 @@ import com.intellij.ui.JBColor;
 import com.intellij.ui.ScrollPaneFactory;
 import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.Consumer;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -96,10 +97,16 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
                 new SwingWorker<GradleNode, Void>() {
                     protected GradleNode doInBackground() throws Exception {
-                        Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
-                        GradleNode root = dependencyMap.get("root");
-                        updateView(root);
-                        return root;
+                        try {
+                            Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
+                            GradleNode root = dependencyMap.get("root");
+                            updateView(root);
+                            return root;
+                        } catch(Exception e) {
+                            e.printStackTrace();
+                            toolingLogger.log(ExceptionUtils.getFullStackTrace(e));
+                            throw new RuntimeException(e);
+                        }
                     }
                 }.execute();
             }

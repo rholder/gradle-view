@@ -17,18 +17,17 @@ buildscript {
     }
 }
 
-repositories {
-    maven {
-        url 'http://repo.gradle.org/gradle/libs-releases-local'
+allprojects {
+    repositories {
+        maven {
+            url 'http://repo.gradle.org/gradle/libs-releases-local'
+        }
+        mavenCentral()
     }
-    mavenCentral()
 }
 
 configurations {
     provided
-    runtime {
-        transitive = false
-    }
 }
 
 sourceSets.main {
@@ -50,6 +49,7 @@ dependencies {
     compile "org.gradle:gradle-tooling-api:${gradleToolingApiVersion}"
     compile 'com.google.guava:guava:11.0.2'
     compile 'commons-io:commons-io:2.2'
+    compile 'commons-lang:commons-lang:2.6'
 
     runtime 'org.slf4j:slf4j-simple:1.7.2'
 
@@ -58,8 +58,11 @@ dependencies {
     provided files('intellij/openapi-135.690.jar')
     provided files('intellij/util-135.690.jar')
 
-    // just need the project jar
-    compile project(':gradle-acumen') {
+    // force this project to build before assembling jar so we can stuff it in there
+    provided project(':gradle-acumen')
+
+    // just need the api jar
+    compile(project(':gradle-acumen-api')) {
         transitive = false
     }
 }

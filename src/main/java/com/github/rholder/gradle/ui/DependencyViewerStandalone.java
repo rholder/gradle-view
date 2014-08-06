@@ -18,6 +18,7 @@ package com.github.rholder.gradle.ui;
 
 import com.github.rholder.gradle.dependency.GradleNode;
 import com.github.rholder.gradle.log.ToolingLogger;
+import org.apache.commons.lang.exception.ExceptionUtils;
 
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -111,23 +112,29 @@ public class DependencyViewerStandalone extends JFrame {
             new SwingWorker<Void, Void>() {
                 protected Void doInBackground() throws Exception {
 
-                    Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
-                    GradleNode tree = dependencyMap.get("root");
+                    try {
+                        Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
+                        GradleNode tree = dependencyMap.get("root");
 
-                    // TODO wire in loadDependencyInsight task when it's working
-                    /*
-                    GradleNode target = dependencyCellRenderer.selectedGradleNode;
-                    GradleNode dependency;
-                    if(target != null && target.group != null) {
-                        Map<String, GradleNode> dependencyInsightMap = loadDependencyInsight(gradleBaseDir, toolingLogger, target.group, target.id);
-                        dependency = dependencyInsightMap.get("root");
-                    } else {
-                        dependency = new GradleNode("No dependency selected");
+                        // TODO wire in loadDependencyInsight task when it's working
+                        /*
+                        GradleNode target = dependencyCellRenderer.selectedGradleNode;
+                        GradleNode dependency;
+                        if(target != null && target.group != null) {
+                            Map<String, GradleNode> dependencyInsightMap = loadDependencyInsight(gradleBaseDir, toolingLogger, target.group, target.id);
+                            dependency = dependencyInsightMap.get("root");
+                        } else {
+                            dependency = new GradleNode("No dependency selected");
+                        }
+                        */
+
+                        updateView(tree, null);
+                        return null;
+                    } catch(Exception e) {
+                        e.printStackTrace();
+                        toolingLogger.log(ExceptionUtils.getFullStackTrace(e));
+                        throw new RuntimeException(e);
                     }
-                    */
-
-                    updateView(tree, null);
-                    return null;
                 }
             }.execute();
         }
