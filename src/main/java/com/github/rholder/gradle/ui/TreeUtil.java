@@ -62,7 +62,7 @@ public class TreeUtil {
         // top level GradleNode instances are actually the configuration strings
         GradleNode sortedNode = new GradleNode("Dependency List");
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(sortedNode);
-        for(GradleNode node : root.dependencies) {
+        for(GradleNode node : new TreeSet<GradleNode>(root.dependencies)) {
             if("configuration".equals(node.getNodeType())) {
                 DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(node);
                 rootNode.add(configurationNode);
@@ -78,7 +78,7 @@ public class TreeUtil {
                 DefaultMutableTreeNode moduleNode = new DefaultMutableTreeNode(node);
                 rootNode.add(moduleNode);
 
-                for(GradleNode configuration : node.dependencies) {
+                for(GradleNode configuration : new TreeSet<GradleNode>(node.dependencies)) {
                     DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
                     moduleNode.add(configurationNode);
 
