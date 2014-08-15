@@ -28,10 +28,12 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
+import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.WindowConstants;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.awt.BorderLayout;
@@ -41,8 +43,8 @@ import java.awt.event.KeyEvent;
 import java.util.Map;
 
 import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependenciesFromModel;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToHierarchyTreeNode;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
-import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
 
 public class DependencyViewerStandalone extends JFrame {
 
@@ -53,10 +55,12 @@ public class DependencyViewerStandalone extends JFrame {
     private String gradleBaseDir;
     private JSplitPane splitter;
     private ToolingLogger toolingLogger;
+    private JTextArea information;
 
     public DependencyViewerStandalone() {
         super(TITLE);
         this.dependencyCellRenderer = new DependencyCellRenderer();
+        this.information = new JTextArea();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(1024, 768);
@@ -107,7 +111,7 @@ public class DependencyViewerStandalone extends JFrame {
 
     private void refresh() {
         if(gradleBaseDir != null) {
-            updateView(new GradleNode("Loading..."), new GradleNode("No dependency selected"));
+            updateView(null, null);
 
             new SwingWorker<Void, Void>() {
                 protected Void doInBackground() throws Exception {
@@ -116,19 +120,15 @@ public class DependencyViewerStandalone extends JFrame {
                         Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
                         GradleNode tree = dependencyMap.get("root");
 
-                        // TODO wire in loadDependencyInsight task when it's working
-                        /*
                         GradleNode target = dependencyCellRenderer.selectedGradleNode;
                         GradleNode dependency;
                         if(target != null && target.group != null) {
-                            Map<String, GradleNode> dependencyInsightMap = loadDependencyInsight(gradleBaseDir, toolingLogger, target.group, target.id);
-                            dependency = dependencyInsightMap.get("root");
+                            dependency = target;
                         } else {
                             dependency = new GradleNode("No dependency selected");
                         }
-                        */
 
-                        updateView(tree, null);
+                        updateView(tree, dependency);
                         return null;
                     } catch(Exception e) {
                         e.printStackTrace();
@@ -148,6 +148,7 @@ public class DependencyViewerStandalone extends JFrame {
                     public void run() {
                         if (gradleBaseDir != null) {
                             setTitle("- " + gradleBaseDir + " - " + line);
+                            information.append(line + "\n");
                         }
                     }
                 });
@@ -175,24 +176,34 @@ public class DependencyViewerStandalone extends JFrame {
         }
     }
 
-    public void updateView(GradleNode tree, GradleNode dependency) {
+    public void updateView(GradleNode rootDependency, GradleNode selectedDependency) {
         // TODO replace this hack with something that populates the GradleNode graph
 
-        TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(tree));
-        final JTree leftTree = new JTree(leftModel);
-        leftTree.setCellRenderer(dependencyCellRenderer);
+        DefaultMutableTreeNode fullRoot = new DefaultMutableTreeNode(new GradleNode("Project Dependencies"));
+        if(rootDependency == null) {
+            DefaultMutableTreeNode loading = new DefaultMutableTreeNode(new GradleNode("Loading..."));
+            fullRoot.add(loading);
+        } else {
+            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
+            DefaultMutableTreeNode flattenedRoot = convertToSortedTreeNode(rootDependency);
+            fullRoot.add(hierarchyRoot);
+            fullRoot.add(flattenedRoot);
+        }
 
-        TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(tree));
-        final JTree rightTree = new JTree(rightModel);
-        rightTree.setCellRenderer(dependencyCellRenderer);
+        TreeModel treeModel = new DefaultTreeModel(fullRoot);
+        final JTree fullTree = new JTree(treeModel);
+        fullTree.setCellRenderer(dependencyCellRenderer);
+
+        // expand path for first level from root
+        //fullTree.expandPath(new TreePath(hierarchyRoot.getNextNode().getPath()));
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if(gradleBaseDir != null) {
                     setTitle(TITLE + " - " + gradleBaseDir);
                 }
-                splitter.setLeftComponent(new JScrollPane(leftTree));
-                splitter.setRightComponent(new JScrollPane(rightTree));
+                splitter.setLeftComponent(new JScrollPane(fullTree));
+                splitter.setRightComponent(new JScrollPane(information));
                 splitter.setDividerLocation(0.5);
             }
         });

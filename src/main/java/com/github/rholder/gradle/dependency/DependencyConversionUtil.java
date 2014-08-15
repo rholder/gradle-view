@@ -142,6 +142,7 @@ public class DependencyConversionUtil {
         } else {
             gradleNode = new GradleNode(treeNode.getName());
         }
+        gradleNode.nodeType = treeNode.getNodeType();
 
         for (GradleTreeNode c : treeNode.getChildren()) {
             gradleNode.dependencies.add(convertToGradleNode(gradleNode, c));

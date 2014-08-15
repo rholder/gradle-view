@@ -39,8 +39,10 @@ import com.intellij.ui.treeStructure.SimpleTree;
 import com.intellij.util.Consumer;
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import java.util.List;
@@ -48,7 +50,7 @@ import java.util.Map;
 
 import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependenciesFromModel;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
-import static com.github.rholder.gradle.ui.TreeUtil.convertToTreeNode;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToHierarchyTreeNode;
 
 public class DependencyViewer extends SimpleToolWindowPanel {
 
@@ -57,6 +59,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
     private final Splitter splitter;
     private final ToolingLogger toolingLogger;
     private final DependencyCellRenderer dependencyCellRenderer;
+    private final JTextArea information;
     private String gradleBaseDir;
     private boolean shouldPromptForCurrentProject;
 
@@ -65,6 +68,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         this.project = p;
         this.toolWindow = t;
         this.splitter = new Splitter();
+        this.information = new JTextArea();
         this.toolingLogger = initToolingLogger();
 
         this.dependencyCellRenderer = new DependencyCellRenderer();
@@ -93,15 +97,24 @@ public class DependencyViewer extends SimpleToolWindowPanel {
                     promptForGradleBaseDir();
                 }
 
-                updateView(new GradleNode("Loading..."));
+                updateView(null, null);
 
                 new SwingWorker<GradleNode, Void>() {
                     protected GradleNode doInBackground() throws Exception {
                         try {
                             Map<String, GradleNode> dependencyMap = loadProjectDependenciesFromModel(gradleBaseDir, toolingLogger);
-                            GradleNode root = dependencyMap.get("root");
-                            updateView(root);
-                            return root;
+                            GradleNode rootDependency = dependencyMap.get("root");
+
+                            GradleNode target = dependencyCellRenderer.selectedGradleNode;
+                            GradleNode selectedDependency;
+                            if(target != null && target.group != null) {
+                                selectedDependency = target;
+                            } else {
+                                selectedDependency = new GradleNode("No dependency selected");
+                            }
+
+                            updateView(rootDependency, selectedDependency);
+                            return rootDependency;
                         } catch(Exception e) {
                             e.printStackTrace();
                             toolingLogger.log(ExceptionUtils.getFullStackTrace(e));
@@ -138,7 +151,6 @@ public class DependencyViewer extends SimpleToolWindowPanel {
 
         actionToolbar.setTargetComponent(splitter);
         setToolbar(actionToolbar.getComponent());
-
     }
 
     private ToolingLogger initToolingLogger() {
@@ -149,6 +161,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
                     public void run() {
                         if(gradleBaseDir != null) {
                             toolWindow.setTitle("- " + gradleBaseDir + " - " + line);
+                            information.append(line + "\n");
                         }
                     }
                 });
@@ -156,24 +169,34 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         };
     }
 
-    public void updateView(GradleNode dependency) {
+    public void updateView(GradleNode rootDependency, final GradleNode selectedDependency) {
         // TODO replace this hack with something that populates the GradleNode graph
 
-        TreeModel leftModel = new DefaultTreeModel(convertToTreeNode(dependency));
-        final SimpleTree leftTree = new SimpleTree(leftModel);
-        leftTree.setCellRenderer(dependencyCellRenderer);
+        DefaultMutableTreeNode fullRoot = new DefaultMutableTreeNode(new GradleNode("Project Dependencies"));
+        if(rootDependency == null) {
+            DefaultMutableTreeNode loading = new DefaultMutableTreeNode(new GradleNode("Loading..."));
+            fullRoot.add(loading);
+        } else {
+            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
+            DefaultMutableTreeNode flattenedRoot = convertToSortedTreeNode(rootDependency);
+            fullRoot.add(hierarchyRoot);
+            fullRoot.add(flattenedRoot);
+        }
 
-        TreeModel rightModel = new DefaultTreeModel(convertToSortedTreeNode(dependency));
-        final SimpleTree rightTree = new SimpleTree(rightModel);
-        rightTree.setCellRenderer(dependencyCellRenderer);
+        TreeModel treeModel = new DefaultTreeModel(fullRoot);
+        final SimpleTree fullTree = new SimpleTree(treeModel);
+        fullTree.setCellRenderer(dependencyCellRenderer);
+
+        // expand path for first level from root
+        //fullTree.expandPath(new TreePath(hierarchyRoot.getNextNode().getPath()));
 
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 if(gradleBaseDir != null) {
                     toolWindow.setTitle("- " + gradleBaseDir);
                 }
-                splitter.setFirstComponent(ScrollPaneFactory.createScrollPane(leftTree));
-                splitter.setSecondComponent(ScrollPaneFactory.createScrollPane(rightTree));
+                splitter.setFirstComponent(ScrollPaneFactory.createScrollPane(fullTree));
+                splitter.setSecondComponent(ScrollPaneFactory.createScrollPane(information));
             }
         });
     }

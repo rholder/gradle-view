@@ -28,6 +28,14 @@ import java.util.TreeSet;
  */
 public class TreeUtil {
 
+    public static DefaultMutableTreeNode convertToHierarchyTreeNode(GradleNode dependency) {
+        GradleNode hierarchicalNode = new GradleNode("Dependency Hierarchy");
+        DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(hierarchicalNode);
+        DefaultMutableTreeNode projectNode = convertToTreeNode(dependency);
+        rootNode.add(projectNode);
+        return rootNode;
+    }
+
     /**
      * Recursively convert the given dependency to a collection of nested
      * DefaultMutableTreeNode instances suitable for display in a tree
@@ -52,22 +60,34 @@ public class TreeUtil {
      */
     public static DefaultMutableTreeNode convertToSortedTreeNode(GradleNode root) {
         // top level GradleNode instances are actually the configuration strings
-        GradleNode sortedNode = new GradleNode("Flattened Project Dependencies");
+        GradleNode sortedNode = new GradleNode("Dependency List");
         DefaultMutableTreeNode rootNode = new DefaultMutableTreeNode(sortedNode);
-        for(GradleNode module : root.dependencies) {
-
-            DefaultMutableTreeNode moduleNode = new DefaultMutableTreeNode(module);
-            rootNode.add(moduleNode);
-
-            for(GradleNode configuration : module.dependencies) {
-                DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
-                moduleNode.add(configurationNode);
+        for(GradleNode node : root.dependencies) {
+            if("configuration".equals(node.getNodeType())) {
+                DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(node);
+                rootNode.add(configurationNode);
 
                 // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
-                Set<GradleNode> childDependencies = getChildrenFromRootNode(configuration);
+                Set<GradleNode> childDependencies = getChildrenFromRootNode(node);
                 for(GradleNode d : childDependencies) {
                     if(!d.isOmitted() && d.parent != null) {
                         configurationNode.add(new DefaultMutableTreeNode(d));
+                    }
+                }
+            } else if("project".equals(node.getNodeType())) {
+                DefaultMutableTreeNode moduleNode = new DefaultMutableTreeNode(node);
+                rootNode.add(moduleNode);
+
+                for(GradleNode configuration : node.dependencies) {
+                    DefaultMutableTreeNode configurationNode = new DefaultMutableTreeNode(configuration);
+                    moduleNode.add(configurationNode);
+
+                    // TODO filter dupes here by fixing equals/hashCode, though there are no dupes unless Gradle is broken...
+                    Set<GradleNode> childDependencies = getChildrenFromRootNode(configuration);
+                    for(GradleNode d : childDependencies) {
+                        if(!d.isOmitted() && d.parent != null) {
+                            configurationNode.add(new DefaultMutableTreeNode(d));
+                        }
                     }
                 }
             }

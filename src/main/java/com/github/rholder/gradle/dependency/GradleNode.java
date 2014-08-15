@@ -34,6 +34,7 @@ public class GradleNode implements Comparable<GradleNode> {
     public String group;
     public String id;
     public String version;
+    public String nodeType;
 
     public boolean omitted = false;
     public String replacedByVersion = null;
@@ -89,6 +90,10 @@ public class GradleNode implements Comparable<GradleNode> {
      */
     public String getFinalVersion() {
         return isReplaced() ? replacedByVersion : version;
+    }
+
+    public String getNodeType() {
+        return nodeType;
     }
 
     /**
