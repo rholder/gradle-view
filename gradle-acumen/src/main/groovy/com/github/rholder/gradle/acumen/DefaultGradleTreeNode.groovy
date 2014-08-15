@@ -10,6 +10,7 @@ class DefaultGradleTreeNode implements GradleTreeNode, Serializable {
     String group
     String id
     String version
+    String nodeType
     List<GradleTreeNode> children = new ArrayList<GradleTreeNode>()
 
     boolean seenBefore = false
@@ -24,6 +25,7 @@ class DefaultGradleTreeNode implements GradleTreeNode, Serializable {
         if (group != that.group) return false
         if (id != that.id) return false
         if (name != that.name) return false
+        if (nodeType != that.nodeType) return false
         if (version != that.version) return false
 
         return true
@@ -35,6 +37,7 @@ class DefaultGradleTreeNode implements GradleTreeNode, Serializable {
         result = 31 * result + (group != null ? group.hashCode() : 0)
         result = 31 * result + (id != null ? id.hashCode() : 0)
         result = 31 * result + (version != null ? version.hashCode() : 0)
+        result = 31 * result + nodeType.hashCode()
         return result
     }
 }

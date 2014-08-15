@@ -30,7 +30,8 @@ class GradleAcumenPlugin implements Plugin<Project> {
             DefaultGradleTreeNode rootNode = new DefaultGradleTreeNode(
                     name: project.name,
                     group: project.group,
-                    version: project.version
+                    version: project.version,
+                    nodeType: "project"
             )
 
             project.subprojects.each {
@@ -39,8 +40,10 @@ class GradleAcumenPlugin implements Plugin<Project> {
 
             //noinspection GroovyAssignabilityCheck
             project.configurations.each { Configuration conf ->
-                DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode()
-                configurationNode.name = conf.name
+                DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode(
+                        name: conf.name,
+                        nodeType: "configuration"
+                )
 
                 // reprocessing existing deps can overflow the stack when there are cycles
                 Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
@@ -63,6 +66,7 @@ class GradleAcumenPlugin implements Plugin<Project> {
                 node.group = r.selected.moduleVersion.getGroup()
                 node.id = r.selected.moduleVersion.getName()
                 node.version = r.selected.moduleVersion.getVersion()
+                node.nodeType = "dependency"
 
                 if (existingDeps.add(node)) {
                     // only process children if we haven't seen this dep before
