@@ -24,6 +24,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeCellRenderer;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 
 /**
  * Add some text highlighting and other visual indicators to the view of
@@ -63,6 +64,9 @@ public class DependencyCellRenderer extends JLabel implements TreeCellRenderer {
         }
 
         setText(text);
+        setToolTipText(text);
+        setPreferredSize(new Dimension(640, getPreferredSize().height));
+
         return this;
     }
 }
