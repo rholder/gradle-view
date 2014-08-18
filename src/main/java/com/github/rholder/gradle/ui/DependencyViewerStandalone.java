@@ -185,10 +185,10 @@ public class DependencyViewerStandalone extends JFrame {
             DefaultMutableTreeNode loading = new DefaultMutableTreeNode(new GradleNode("Loading..."));
             fullRoot.add(loading);
         } else {
-            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
             DefaultMutableTreeNode flattenedRoot = convertToSortedTreeNode(rootDependency);
-            fullRoot.add(hierarchyRoot);
+            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
             fullRoot.add(flattenedRoot);
+            fullRoot.add(hierarchyRoot);
         }
 
         TreeModel treeModel = new DefaultTreeModel(fullRoot);
@@ -205,7 +205,7 @@ public class DependencyViewerStandalone extends JFrame {
                 }
                 splitter.setLeftComponent(new JScrollPane(fullTree));
                 splitter.setRightComponent(new JScrollPane(information));
-                splitter.setDividerLocation(0.5);
+                splitter.setDividerLocation(0.75);
             }
         });
     }

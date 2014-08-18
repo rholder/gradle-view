@@ -67,7 +67,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         super(true, true);
         this.project = p;
         this.toolWindow = t;
-        this.splitter = new Splitter();
+        this.splitter = new Splitter(false, 0.75f);
         this.information = new JTextArea();
         this.toolingLogger = initToolingLogger();
 
@@ -178,10 +178,10 @@ public class DependencyViewer extends SimpleToolWindowPanel {
             DefaultMutableTreeNode loading = new DefaultMutableTreeNode(new GradleNode("Loading..."));
             fullRoot.add(loading);
         } else {
-            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
             DefaultMutableTreeNode flattenedRoot = convertToSortedTreeNode(rootDependency);
-            fullRoot.add(hierarchyRoot);
+            DefaultMutableTreeNode hierarchyRoot = convertToHierarchyTreeNode(rootDependency);
             fullRoot.add(flattenedRoot);
+            fullRoot.add(hierarchyRoot);
         }
 
         TreeModel treeModel = new DefaultTreeModel(fullRoot);
