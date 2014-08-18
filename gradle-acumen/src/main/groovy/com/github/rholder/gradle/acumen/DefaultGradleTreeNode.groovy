@@ -11,10 +11,11 @@ class DefaultGradleTreeNode implements GradleTreeNode, Serializable {
     String id
     String version
     String nodeType
+    String reason
+    String requestedVersion
     List<GradleTreeNode> children = new ArrayList<GradleTreeNode>()
 
     boolean seenBefore = false
-    String unresolvedVersion
 
     boolean equals(o) {
         if (this.is(o)) return true

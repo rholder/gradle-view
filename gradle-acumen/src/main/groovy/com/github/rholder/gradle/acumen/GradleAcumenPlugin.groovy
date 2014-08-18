@@ -4,6 +4,7 @@ import com.github.rholder.gradle.acumen.api.AcumenTreeModel
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.component.ModuleComponentSelector
 import org.gradle.api.artifacts.result.DependencyResult
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.tooling.provider.model.ToolingModelBuilder
@@ -63,9 +64,15 @@ class GradleAcumenPlugin implements Plugin<Project> {
             if (result instanceof ResolvedDependencyResult) {
                 ResolvedDependencyResult r = result
                 node.parent = parentNode
-                node.group = r.selected.moduleVersion.getGroup()
-                node.id = r.selected.moduleVersion.getName()
-                node.version = r.selected.moduleVersion.getVersion()
+                node.group = r.selected.moduleVersion.group
+                node.id = r.selected.moduleVersion.name
+                node.version = r.selected.moduleVersion.version
+                node.reason = r.selected.selectionReason.description
+
+                if(r.requested instanceof ModuleComponentSelector) {
+                    node.requestedVersion = ((ModuleComponentSelector)r.requested).version
+                }
+
                 node.nodeType = "dependency"
 
                 if (existingDeps.add(node)) {

@@ -8,6 +8,8 @@ interface GradleTreeNode {
     String getGroup()
     String getId()
     String getVersion()
+    String getReason()
+    String getRequestedVersion()
     String getNodeType()
 
     List<GradleTreeNode> getChildren()
