@@ -137,8 +137,20 @@ public class DependencyConversionUtil {
     private static GradleNode convertToGradleNode(GradleNode parent, GradleTreeNode treeNode) {
         GradleNode gradleNode;
         if (treeNode.getName() == null) {
-            gradleNode = new GradleNode(parent, treeNode.getGroup(), treeNode.getId(), treeNode.getVersion());
+            if(treeNode.getRequestedVersion() == null) {
+                // there is no requested version, only the final version
+                gradleNode = new GradleNode(parent, treeNode.getGroup(), treeNode.getId(), treeNode.getVersion());
+            } else {
+                // an explicitly requested version exists
+                gradleNode = new GradleNode(parent, treeNode.getGroup(), treeNode.getId(), treeNode.getRequestedVersion());
+                if(!treeNode.getVersion().equals(treeNode.getRequestedVersion())) {
+                    // it's been overridden by the final version
+                    gradleNode.replacedByVersion = treeNode.getVersion();
+                }
+            }
+
             gradleNode.omitted = treeNode.getSeenBefore();
+            gradleNode.reason = treeNode.getReason();
         } else {
             gradleNode = new GradleNode(treeNode.getName());
         }
