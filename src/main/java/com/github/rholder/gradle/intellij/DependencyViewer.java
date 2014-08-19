@@ -76,7 +76,7 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         this.dependencyCellRenderer.omittedUnselected = JBColor.GRAY;
         this.dependencyCellRenderer.normalSelected = JBColor.RED;
         this.dependencyCellRenderer.normalUnselected = JBColor.BLACK;
-        this.information.setEnabled(false);
+        this.information.setEditable(false);
 
         this.shouldPromptForCurrentProject = true;
 

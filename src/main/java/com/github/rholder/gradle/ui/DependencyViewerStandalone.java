@@ -61,7 +61,7 @@ public class DependencyViewerStandalone extends JFrame {
         super(TITLE);
         this.dependencyCellRenderer = new DependencyCellRenderer();
         this.information = new JTextArea();
-        this.information.setEnabled(false);
+        this.information.setEditable(false);
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(1024, 768);
