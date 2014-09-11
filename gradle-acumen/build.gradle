@@ -5,8 +5,27 @@ apply plugin: 'idea'
 group = 'com.github.rholder'
 version = '0.1.0'
 
+configurations {
+    bundled
+}
+
 dependencies {
     compile gradleApi()
+    compile project(':gradle-acumen-api')
+
+    // we want to include gradle-acumen-api classes inside the final jar
+    bundled(project(':gradle-acumen-api')) {
+        transitive = false
+    }
+}
+
+jar {
+    // include anything in the bundled configuration in the final jar
+    from {
+        configurations.bundled.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
 }
 
 task sourceJar(type: Jar) {
