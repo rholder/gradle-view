@@ -1,23 +1,24 @@
 ##What is this?
 Dependency wrangling isn't easy in a large Java project. This IntelliJ IDEA plugin was built to add a little more sanity
 to the tedious task of analyzing dependencies by rolling up the entire dependency graph into a pair of more easily
-digestible trees derived from the command line output of Gradle's dependencies task. The first tree provides a nested
-view of each Gradle configuration. Grey dependencies in the tree indicate it was included by a previous dependency that
-was added before (and can be omitted if it is explicitly being included).  The second tree provides a lexicographically
-sorted set of all the dependencies for each configuration.
+digestible trees derived from a serialized version of Gradle's dependency graph. The `Dependency List` provides a
+lexicographically sorted set of all the dependencies for each configuration in your project and all of its sub-projects.
+The `Dependency Hierarchy` shows a nested view of each Gradle configuration in your project and all of its sub-projects.
+Grey dependencies in the tree indicate it was included by a previous dependency that was added before (and can be safely
+omitted if it is explicitly being included).
 
 ##Features
- * Built on the [Gradle Tooling API 1.6](http://gradle.org/docs/1.6/userguide/embedding.html)
+ * Built on the [Gradle Tooling API 1.12](http://www.gradle.org/docs/1.12/userguide/embedding.html)
  * Visual highlighting to indicate dependencies in use and replacement versions
- * Lexicographically sorted listing for all active Gradle configurations
+ * Lexicographically sorted listing for all Gradle configurations
  * Load any project's Gradle dependencies, not just the one currently open inside IntelliJ
  * Toggle the showing of replaced dependencies
 
 ##Installation
 The latest version of the Gradle View plugin is available on the
-[JetBrains Plugin Repository](http://plugins.intellij.net/). The first time you interact with Gradle View, you may
-need to download the embedded version of Gradle 1.6 in case you don't already have a cached copy available on your
-workstation. This should be seamless, and the tool window title will indicate a download of this is in progress.
+[JetBrains Plugin Repository](http://plugins.jetbrains.com/). The first time you interact with Gradle View, you may
+need to download the embedded version of Gradle 1.12 in case you don't already have a cached copy available on your
+workstation. This should be seamless, and the tool window title and log will indicate a download of this is in progress.
 You may also build and install the plugin from source (see below).
 
 ##Building from source
@@ -35,8 +36,8 @@ for details.
 ### add Gradle build variables
 Create a custom `gradle.properties` file in the root directory and add a tooling version to use, as in:
 
-    gradleToolingApiVersion=1.6
-    ideaPluginJdkName=IDEA IU-117.418
+    gradleToolingApiVersion=1.12
+    ideaPluginJdkName=IDEA IU-135.690
 
 The `ideaPluginJdkName` should be the version you have referenced in your IntelliJ IDE.
 

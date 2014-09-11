@@ -1,3 +1,8 @@
+##2.0.0 - 2014-09-10
+* Major rewrite of the Gradle Tooling API integration using 1.12 and custom model serialization
+* Added handling of multi-module project dependency graphs for all configurations
+* Added separate scrolling log window
+
 ##1.0.1 - 2013-07-21
 * Adjusted color for highlighting on the Darcula theme
 * Added toggle to switch between display of actual/replaced versions for [#3](https://github.com/rholder/gradle-view/issues/3)
