@@ -1,7 +1,39 @@
 <idea-plugin version="2">
     <name>Gradle View</name>
-    <description>Show a split tree rollup of the dependencies for each Gradle configuration in use by a project.</description>
-    <version>2.0.1</version>
+    <description>
+        Show a split tree rollup of the dependencies for each Gradle configuration in use by a project.
+    </description>
+    <version>2.0.2</version>
+    <change-notes><![CDATA[
+    <p>2.0.1 - 2014-09-22
+    <ul>
+        <li>Fixed a Windows path bug with absolute file names <a href="https://github.com/rholder/gradle-view/issues/5">#5</a></li>
+    </ul>
+    </p>
+
+    <p>2.0.0 - 2014-09-10
+    <ul>
+        <li>Major rewrite of the Gradle Tooling API integration using 1.12 and custom model serialization</li>
+        <li>Added handling of multi-module project dependency graphs for all configurations</li>
+        <li>Added separate scrolling log window</li>
+    </ul>
+    </p>
+
+    <p>1.0.1 - 2013-07-21
+    <ul>
+        <li>Adjusted color for highlighting on the Darcula theme</li>
+        <li>Added toggle to switch between display of actual/replaced versions for <a href="https://github.com/rholder/gradle-view/issues/3">#3</a></li>
+        <li>Fixed handling of configurations with "No dependencies" for <a href="https://github.com/rholder/gradle-view/issues/2">#2</a></li>
+        <li>Code cleanup and preparation for the dependencyInsight task once it's available in the Gradle Tooling API</li>
+    </ul>
+    </p>
+
+    <p>1.0.0 - 2012-01-03
+    <ul>
+        <li>Initial stable release</li>
+    </ul>
+    </p>
+    ]]></change-notes>
     <vendor>rholder</vendor>
 
     <idea-version since-build="135"/>
