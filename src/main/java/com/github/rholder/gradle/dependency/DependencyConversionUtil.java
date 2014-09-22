@@ -84,7 +84,7 @@ public class DependencyConversionUtil {
             File extractedJarFile;
             String devGradleAcumen = System.getProperty("gradle.view.debug.acumen.jar");
             if(devGradleAcumen == null) {
-                extractedJarFile = File.createTempFile("gradle-acumen", "jar");
+                extractedJarFile = File.createTempFile("gradle-acumen", ".jar");
                 extractedJarFile.deleteOnExit();
                 dumpFromClasspath("/gradle-acumen-0.1.0.jar", extractedJarFile);
             } else {
@@ -110,7 +110,9 @@ public class DependencyConversionUtil {
 
     private static void acumenTemplateFromClasspath(File extractedJarFile, File outputFile) throws IOException {
         InputStream input = DependencyConversionUtil.class.getResourceAsStream("/init-acumen.gradle");
-        String processed = IOUtils.toString(input).replace("#ACUMEN_JAR#", extractedJarFile.getAbsolutePath());
+
+        // replace token with extracted file, replace '\' with '/' to handle Windows paths
+        String processed = IOUtils.toString(input).replace("#ACUMEN_JAR#", extractedJarFile.getAbsolutePath()).replace("\\", "/");
         input.close();
 
         InputStream processedInput = IOUtils.toInputStream(processed);
