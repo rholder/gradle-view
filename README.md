@@ -7,6 +7,8 @@ The `Dependency Hierarchy` shows a nested view of each Gradle configuration in y
 Grey dependencies in the tree indicate it was included by a previous dependency that was added before (and can be safely
 omitted if it is explicitly being included).
 
+![Gradle View](http://plugins.jetbrains.com/files/7150/screenshot_14710.png)
+
 ##Features
  * Built on the [Gradle Tooling API 1.12](http://www.gradle.org/docs/1.12/userguide/embedding.html)
  * Visual highlighting to indicate dependencies in use and replacement versions
