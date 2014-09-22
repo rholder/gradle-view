@@ -1,3 +1,6 @@
+##2.0.1 - 2014-09-22
+* Fixed a Windows path bug with absolute file names [#5](https://github.com/rholder/gradle-view/issues/5)
+
 ##2.0.0 - 2014-09-10
 * Major rewrite of the Gradle Tooling API integration using 1.12 and custom model serialization
 * Added handling of multi-module project dependency graphs for all configurations
