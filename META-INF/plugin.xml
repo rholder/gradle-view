@@ -1,10 +1,10 @@
 <idea-plugin version="2">
     <name>Gradle View</name>
     <description><![CDATA[
-        <p><h2>What is this?</h2></p>
+        <p><b>What is this?</b></p>
         <p>Show a split tree rollup of the dependencies for each Gradle configuration in use by a project.</p>
 
-        <p><h2>Why would I need this?</h2></p>
+        <p><b>Why would I need this?</b></p>
         <p>
             Dependency wrangling isn't easy in a large Java project. This IntelliJ IDEA plugin was built to add a little
             more sanity to the tedious task of analyzing dependencies by rolling up the entire dependency graph into a
@@ -16,7 +16,7 @@
             being included).
         </p>
 
-        <p><h2>Features</h2></p>
+        <p><b>Features</b></p>
         <ul>
             <li>Built on the Gradle Tooling API 1.12, but should work on most 1.x and 2.x versions</li>
             <li>Visual highlighting to indicate dependencies in use and replacement versions</li>
