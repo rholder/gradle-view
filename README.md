@@ -1,4 +1,8 @@
 ##What is this?
+The Gradle View IntelliJ IDEA plugin shows a split tree rollup of the dependencies for each Gradle configuration in use
+by a project.
+
+##What is this?
 Dependency wrangling isn't easy in a large Java project. This IntelliJ IDEA plugin was built to add a little more sanity
 to the tedious task of analyzing dependencies by rolling up the entire dependency graph into a pair of more easily
 digestible trees derived from a serialized version of Gradle's dependency graph. The `Dependency List` provides a
@@ -10,7 +14,7 @@ omitted if it is explicitly being included).
 ![Gradle View](http://plugins.jetbrains.com/files/7150/screenshot_14710.png)
 
 ##Features
- * Built on the [Gradle Tooling API 1.12](http://www.gradle.org/docs/1.12/userguide/embedding.html)
+ * Built on the [Gradle Tooling API 1.12](http://www.gradle.org/docs/1.12/userguide/embedding.html), but should work on most 1.x and 2.x versions
  * Visual highlighting to indicate dependencies in use and replacement versions
  * Lexicographically sorted listing for all Gradle configurations
  * Load any project's Gradle dependencies, not just the one currently open inside IntelliJ
