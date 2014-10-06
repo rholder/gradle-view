@@ -37,7 +37,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,6 +48,11 @@ import java.util.Map;
  * entities.
  */
 public class DependencyConversionUtil {
+
+    /**
+     * Override this system property if you want to change the JAVA_HOME for only the Gradle View plugin.
+     */
+    public static final String GRADLE_VIEW_JAVA_HOME_KEY = "gradle.view.java.home";
 
     /**
      * Use the Gradle Tooling API to extract dependency information on the
@@ -67,8 +74,8 @@ public class DependencyConversionUtil {
         AcumenTreeModel atm;
         try {
             @SuppressWarnings("unchecked")
-            BuildActionExecuter<AcumenTreeModel> b = connection.action(new AcumenModelAction());
-            b.addProgressListener(new ProgressListener() {
+            BuildActionExecuter<AcumenTreeModel> action = connection.action(new AcumenModelAction());
+            action.addProgressListener(new ProgressListener() {
                 public void statusChanged(ProgressEvent event) {
                     toolingLogger.log(event.getDescription());
                 }
@@ -83,7 +90,7 @@ public class DependencyConversionUtil {
             // use a custom plugin, if this value is set
             File extractedJarFile;
             String devGradleAcumen = System.getProperty("gradle.view.debug.acumen.jar");
-            if(devGradleAcumen == null) {
+            if (devGradleAcumen == null) {
                 extractedJarFile = File.createTempFile("gradle-acumen", ".jar");
                 extractedJarFile.deleteOnExit();
                 dumpFromClasspath("/gradle-acumen-0.1.0.jar", extractedJarFile);
@@ -93,8 +100,13 @@ public class DependencyConversionUtil {
 
             acumenTemplateFromClasspath(extractedJarFile, initAcumenFile);
 
-            b.withArguments("--init-script", initAcumenFile.getAbsolutePath());
-            atm = b.run();
+            action.withArguments("--init-script", initAcumenFile.getAbsolutePath());
+            File jdkHome = getJdkHome();
+            if (jdkHome != null) {
+                toolingLogger.log("Using Gradle JAVA_HOME=" + jdkHome);
+                action.setJavaHome(jdkHome);
+            }
+            atm = action.run();
 
             GradleNode rootNode = convertToGradleNode(atm);
             dependencyMap.put("root", rootNode);
@@ -139,13 +151,13 @@ public class DependencyConversionUtil {
     private static GradleNode convertToGradleNode(GradleNode parent, GradleTreeNode treeNode) {
         GradleNode gradleNode;
         if (treeNode.getName() == null) {
-            if(treeNode.getRequestedVersion() == null) {
+            if (treeNode.getRequestedVersion() == null) {
                 // there is no requested version, only the final version
                 gradleNode = new GradleNode(parent, treeNode.getGroup(), treeNode.getId(), treeNode.getVersion());
             } else {
                 // an explicitly requested version exists
                 gradleNode = new GradleNode(parent, treeNode.getGroup(), treeNode.getId(), treeNode.getRequestedVersion());
-                if(!treeNode.getVersion().equals(treeNode.getRequestedVersion())) {
+                if (!treeNode.getVersion().equals(treeNode.getRequestedVersion())) {
                     // it's been overridden by the final version
                     gradleNode.replacedByVersion = treeNode.getVersion();
                 }
@@ -163,6 +175,30 @@ public class DependencyConversionUtil {
         }
 
         return gradleNode;
+    }
+
+    /**
+     * Return a lazy guess at the JDK home based on the JAVA_HOME.
+     *
+     * @return the JDK home or null if it can't be found
+     */
+    private static File getJdkHome() {
+        List<String> candidates = new ArrayList<String>();
+
+        // read from system property
+        candidates.add(System.getProperty(GRADLE_VIEW_JAVA_HOME_KEY));
+
+        // read from JAVA_HOME environment variable
+        candidates.add(System.getenv("JAVA_HOME"));
+        for (String candidate : candidates) {
+            if (candidate != null) {
+                File jdkHome = new File(candidate);
+                if (jdkHome.exists()) {
+                    return jdkHome;
+                }
+            }
+        }
+        return null;
     }
 
     private static class AcumenModelAction implements Serializable, BuildAction {
