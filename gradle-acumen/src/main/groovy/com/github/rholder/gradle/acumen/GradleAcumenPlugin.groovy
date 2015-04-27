@@ -25,6 +25,40 @@ class GradleAcumenPlugin implements Plugin<Project> {
         registry.register(new AcumenToolingModelBuilder())
     }
 
+    // note: if this method is inside the private AcumenToolingModelBuilder below, it causes issues with Groovy
+    static DefaultGradleTreeNode resolveDependency(DefaultGradleTreeNode parentNode, DependencyResult result, Set<DefaultGradleTreeNode> existingDeps) {
+        DefaultGradleTreeNode node = new DefaultGradleTreeNode()
+        if (result instanceof ResolvedDependencyResult) {
+            ResolvedDependencyResult r = result
+            node.parent = parentNode
+            node.group = r.selected.moduleVersion.group
+            node.id = r.selected.moduleVersion.name
+            node.version = r.selected.moduleVersion.version
+            node.reason = r.selected.selectionReason.description
+
+            if(r.requested instanceof ModuleComponentSelector) {
+                node.requestedVersion = ((ModuleComponentSelector)r.requested).version
+            }
+
+            node.nodeType = "dependency"
+
+            if (existingDeps.add(node)) {
+                // only process children if we haven't seen this dep before
+                r.selected.dependencies.each { DependencyResult subDep ->
+                    DefaultGradleTreeNode childNode = resolveDependency(node, subDep, existingDeps)
+                    node.children.add(childNode)
+                }
+            } else {
+                node.seenBefore = true
+            }
+        } else {
+            // TODO this is where a fix for #10 will start, consider setting node.wasResolved = false or some such
+            node.name = "Could not resolve $result.requested.displayName"
+        }
+
+        return node
+    }
+
     private static class AcumenToolingModelBuilder implements ToolingModelBuilder {
 
         static DefaultGradleTreeNode generateProjectTree(Project project) {
@@ -57,38 +91,6 @@ class GradleAcumenPlugin implements Plugin<Project> {
             }
 
             return rootNode
-        }
-
-        static DefaultGradleTreeNode resolveDependency(DefaultGradleTreeNode parentNode, DependencyResult result, Set<DefaultGradleTreeNode> existingDeps) {
-            DefaultGradleTreeNode node = new DefaultGradleTreeNode()
-            if (result instanceof ResolvedDependencyResult) {
-                ResolvedDependencyResult r = result
-                node.parent = parentNode
-                node.group = r.selected.moduleVersion.group
-                node.id = r.selected.moduleVersion.name
-                node.version = r.selected.moduleVersion.version
-                node.reason = r.selected.selectionReason.description
-
-                if(r.requested instanceof ModuleComponentSelector) {
-                    node.requestedVersion = ((ModuleComponentSelector)r.requested).version
-                }
-
-                node.nodeType = "dependency"
-
-                if (existingDeps.add(node)) {
-                    // only process children if we haven't seen this dep before
-                    r.selected.dependencies.each { DependencyResult subDep ->
-                        DefaultGradleTreeNode childNode = resolveDependency(node, subDep, existingDeps)
-                        node.children.add(childNode)
-                    }
-                } else {
-                    node.seenBefore = true
-                }
-            } else {
-                node.name = "Could not resolve " + result.requested.displayName
-            }
-
-            return node
         }
 
         public boolean canBuild(String modelName) {

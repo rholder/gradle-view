@@ -93,7 +93,7 @@ public class DependencyConversionUtil {
             if (devGradleAcumen == null) {
                 extractedJarFile = File.createTempFile("gradle-acumen", ".jar");
                 extractedJarFile.deleteOnExit();
-                dumpFromClasspath("/gradle-acumen-0.1.0.jar", extractedJarFile);
+                dumpFromClasspath("/gradle-acumen-0.2.0.jar", extractedJarFile);
             } else {
                 extractedJarFile = new File(devGradleAcumen);
             }

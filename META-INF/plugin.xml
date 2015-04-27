@@ -18,17 +18,18 @@
 
         <p><b>Features</b></p>
         <ul>
-            <li>Built on the Gradle Tooling API 1.12, but should work on most 1.x and 2.x versions</li>
+            <li>Built on the Gradle Tooling API 2.3, but should work on most 1.x and 2.x versions</li>
             <li>Visual highlighting to indicate dependencies in use and replacement versions</li>
             <li>Lexicographically sorted listing for all Gradle configurations</li>
             <li>Load any project's Gradle dependencies, not just the one currently open inside IntelliJ</li>
             <li>Toggle the showing of replaced dependencies</li>
         </ul>
     ]]></description>
-    <version>2.0.3</version>
+    <version>2.1.0</version>
     <change-notes><![CDATA[
-    <p>2.0.3 - 2015-XX-XX
+    <p>2.1.0 - 2015-XX-XX
     <ul>
+        <li>Upgrade internal tooling API to use Gradle 2.3 <a href="https://github.com/rholder/gradle-view/issues/11">#11</a></li>
         <li>Removed painful light red on blue background selection color <a href="https://github.com/rholder/gradle-view/issues/6">#6</a></li>
     </ul>
     </p>
