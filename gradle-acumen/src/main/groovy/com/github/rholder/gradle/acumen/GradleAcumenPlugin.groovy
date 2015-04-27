@@ -59,39 +59,39 @@ class GradleAcumenPlugin implements Plugin<Project> {
         return node
     }
 
-    private static class AcumenToolingModelBuilder implements ToolingModelBuilder {
+    static DefaultGradleTreeNode generateProjectTree(Project project) {
+        DefaultGradleTreeNode rootNode = new DefaultGradleTreeNode(
+                name: project.name,
+                group: project.group,
+                version: project.version,
+                nodeType: "project"
+        )
 
-        static DefaultGradleTreeNode generateProjectTree(Project project) {
-            DefaultGradleTreeNode rootNode = new DefaultGradleTreeNode(
-                    name: project.name,
-                    group: project.group,
-                    version: project.version,
-                    nodeType: "project"
+        project.subprojects.each {
+            rootNode.children.add(generateProjectTree(it))
+        }
+
+        //noinspection GroovyAssignabilityCheck
+        project.configurations.each { Configuration conf ->
+            DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode(
+                    name: conf.name,
+                    nodeType: "configuration"
             )
 
-            project.subprojects.each {
-                rootNode.children.add(generateProjectTree(it))
+            // reprocessing existing deps can overflow the stack when there are cycles
+            Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
+            conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
+                DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
+                configurationNode.children.add(dependencyNode)
             }
 
-            //noinspection GroovyAssignabilityCheck
-            project.configurations.each { Configuration conf ->
-                DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode(
-                        name: conf.name,
-                        nodeType: "configuration"
-                )
-
-                // reprocessing existing deps can overflow the stack when there are cycles
-                Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
-                conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
-                    DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
-                    configurationNode.children.add(dependencyNode)
-                }
-
-                rootNode.children.add(configurationNode)
-            }
-
-            return rootNode
+            rootNode.children.add(configurationNode)
         }
+
+        return rootNode
+    }
+
+    private static class AcumenToolingModelBuilder implements ToolingModelBuilder {
 
         public boolean canBuild(String modelName) {
             modelName.equals(AcumenTreeModel.class.getName())

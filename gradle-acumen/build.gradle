@@ -17,6 +17,9 @@ dependencies {
     bundled(project(':gradle-acumen-api')) {
         transitive = false
     }
+
+    // include groovy-backports-compat23 for org.codehaus.groovy.runtime.typehandling.ShortTypeHandling
+    bundled 'org.codehaus.groovy:groovy-backports-compat23:2.3.9'
 }
 
 jar {
