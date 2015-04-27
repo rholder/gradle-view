@@ -19,6 +19,8 @@ dependencies {
     }
 
     // include groovy-backports-compat23 for org.codehaus.groovy.runtime.typehandling.ShortTypeHandling
+    // https://jira.codehaus.org/browse/GROOVY-6973
+    // Groovy 2.3.9 is used in Gradle 2.3 so let's use that groovy-backports-compat23
     bundled 'org.codehaus.groovy:groovy-backports-compat23:2.3.9'
 }
 
