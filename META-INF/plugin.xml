@@ -27,7 +27,7 @@
     ]]></description>
     <version>2.1.0</version>
     <change-notes><![CDATA[
-    <p>2.1.0 - 2015-XX-XX
+    <p>2.1.0 - 2015-04-27
     <ul>
         <li>Upgrade internal tooling API to use Gradle 2.3 <a href="https://github.com/rholder/gradle-view/issues/11">#11</a></li>
         <li>Removed painful light red on blue background selection color <a href="https://github.com/rholder/gradle-view/issues/6">#6</a></li>
