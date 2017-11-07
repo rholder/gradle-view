@@ -36,8 +36,8 @@ class GradleAcumenPlugin implements Plugin<Project> {
             node.version = r.selected.moduleVersion.version
             node.reason = r.selected.selectionReason.description
 
-            if(r.requested instanceof ModuleComponentSelector) {
-                node.requestedVersion = ((ModuleComponentSelector)r.requested).version
+            if (r.requested instanceof ModuleComponentSelector) {
+                node.requestedVersion = ((ModuleComponentSelector) r.requested).version
             }
 
             node.nodeType = "dependency"
@@ -73,19 +73,28 @@ class GradleAcumenPlugin implements Plugin<Project> {
 
         //noinspection GroovyAssignabilityCheck
         project.configurations.each { Configuration conf ->
-            DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode(
-                    name: conf.name,
-                    nodeType: "configuration"
-            )
+            if (conf.name != 'apiElements'
+                    && conf.name != 'implementation'
+                    && conf.name != "runtimeElements"
+                    && conf.name != "runtimeOnly"
+                    && conf.name != "testImplementation"
+                    && conf.name != "testRuntimeOnly"
+            ) {
+                DefaultGradleTreeNode configurationNode = new DefaultGradleTreeNode(
+                        name: conf.name,
+                        nodeType: "configuration"
+                )
 
-            // reprocessing existing deps can overflow the stack when there are cycles
-            Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
-            conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
-                DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
-                configurationNode.children.add(dependencyNode)
+                // reprocessing existing deps can overflow the stack when there are cycles
+                Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
+                conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
+
+                    DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
+                    configurationNode.children.add(dependencyNode)
+                }
+
+                rootNode.children.add(configurationNode)
             }
-
-            rootNode.children.add(configurationNode)
         }
 
         return rootNode
