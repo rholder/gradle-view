@@ -18,7 +18,7 @@
 
         <p><b>Features</b></p>
         <ul>
-            <li>Built on the Gradle Tooling API 2.3, but should work on most 1.x and 2.x versions</li>
+            <li>Built on the Gradle Tooling API 3.5.1, but should work on most 1.x, 2.x, 3.x, and 4.x versions</li>
             <li>Visual highlighting to indicate dependencies in use and replacement versions</li>
             <li>Lexicographically sorted listing for all Gradle configurations</li>
             <li>Load any project's Gradle dependencies, not just the one currently open inside IntelliJ</li>
