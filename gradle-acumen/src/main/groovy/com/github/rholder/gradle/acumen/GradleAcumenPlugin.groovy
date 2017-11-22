@@ -59,6 +59,16 @@ class GradleAcumenPlugin implements Plugin<Project> {
         return node
     }
 
+    static boolean canBeResolved(Configuration conf) {
+        try {
+            // this method doesn't exist before Gradle 3
+            return conf.isCanBeResolved();
+        } catch (Exception e) {
+            // assume everything can be resolved for Gradle < 3
+            return true;
+        }
+    }
+
     static DefaultGradleTreeNode generateProjectTree(Project project) {
         DefaultGradleTreeNode rootNode = new DefaultGradleTreeNode(
                 name: project.name,
@@ -80,12 +90,14 @@ class GradleAcumenPlugin implements Plugin<Project> {
 
             // reprocessing existing deps can overflow the stack when there are cycles
             Set<DefaultGradleTreeNode> existingDeps = new LinkedHashSet<DefaultGradleTreeNode>()
-            conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
-                DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
-                configurationNode.children.add(dependencyNode)
-            }
+            if(canBeResolved(conf)) {
+                conf.incoming.resolutionResult.root.dependencies.each { DependencyResult dr ->
+                    DefaultGradleTreeNode dependencyNode = resolveDependency(configurationNode, dr, existingDeps)
+                    configurationNode.children.add(dependencyNode)
+                }
 
-            rootNode.children.add(configurationNode)
+                rootNode.children.add(configurationNode)
+            }
         }
 
         return rootNode
