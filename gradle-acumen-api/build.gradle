@@ -3,7 +3,7 @@ apply plugin: 'maven-publish'
 apply plugin: 'idea'
 
 group = 'com.github.rholder'
-version = '0.2.0'
+version = '0.3.0'
 
 dependencies {
     compile localGroovy()
