@@ -25,8 +25,15 @@
             <li>Toggle the showing of replaced dependencies</li>
         </ul>
     ]]></description>
-    <version>2.1.0</version>
+    <version>3.0.0</version>
     <change-notes><![CDATA[
+    <p>3.0.0 - 2017-11-21
+    <ul>
+        <li>Upgrade internal tooling API to use Gradle 3.5.1</li>
+        <li>Add dependency resolution compatibility fixes to support Gradle 2.x, 3.x, and 4.x</li>
+        <li>Java bytecode compatibility bumped up to 1.7 to support later versions of Gradle Tooling API</li>
+    </ul>
+    </p>
     <p>2.1.0 - 2015-04-27
     <ul>
         <li>Upgrade internal tooling API to use Gradle 2.3 <a href="https://github.com/rholder/gradle-view/issues/11">#11</a></li>
