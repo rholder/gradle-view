@@ -2,11 +2,11 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'gradle-one-jar'
 
-sourceCompatibility = 1.6
-targetCompatibility = 1.6
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 group = 'com.github.rholder'
-version = '2.1.0'
+version = '3.0.0'
 
 buildscript {
     repositories {
@@ -30,6 +30,8 @@ configurations {
     provided
 }
 
+idea.module.scopes.COMPILE.plus += [configurations.provided]
+
 sourceSets.main {
     compileClasspath += configurations.provided
 }
@@ -41,7 +43,7 @@ jar {
     }
     into('') {
         // well this is wonky...
-        from 'gradle-acumen/build/libs/gradle-acumen-0.2.0.jar'
+        from 'gradle-acumen/build/libs/gradle-acumen-0.3.0.jar'
     }
 }
 
@@ -80,6 +82,7 @@ idea.module {
 
 task distPlugin(type: Zip, dependsOn: jar) {
     description = "Generate the IntelliJ plugin archive from the current project."
+    group = "Distribution"
     into("${project.name}/lib") {
         from jar.archivePath
         from configurations.runtime
@@ -87,6 +90,7 @@ task distPlugin(type: Zip, dependsOn: jar) {
 }
 
 task distStandalone(type: OneJar) {
+    group = "Distribution"
     mainClass = 'com.github.rholder.gradle.ui.DependencyViewerStandalone'
 }
 
