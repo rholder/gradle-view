@@ -58,11 +58,6 @@ dependencies {
 
     runtime 'org.slf4j:slf4j-simple:1.7.2'
 
-    // IntelliJ plugin runtime libraries, since they're not available from a convenient repo
-    // provided files('intellij/extensions-135.690.jar')
-    // provided files('intellij/openapi-135.690.jar')
-    // provided files('intellij/util-135.690.jar')
-
     // force this project to build before assembling jar so we can stuff it in there
     provided project(':gradle-acumen')
 
@@ -71,17 +66,6 @@ dependencies {
         transitive = false
     }
 }
-
-// ensure our project type is set to IntelliJ plugin
-// idea.module {
-//     jdkName = ideaPluginJdkName
-//     iml {
-//         withXml {
-//             def node = it.asNode()
-//             node.attributes().put('type','PLUGIN_MODULE')
-//         }
-//     }
-// }
 
 task distPlugin(type: Zip, dependsOn: jar) {
     description = "Generate the IntelliJ plugin archive from the current project."
