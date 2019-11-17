@@ -1,28 +1,29 @@
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'gradle-one-jar'
+plugins {
+    id "java"
+    id "idea"
+    id "org.jetbrains.intellij" version "0.4.13"
+    id "com.github.johnrengelman.shadow" version "5.1.0"
+}
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
 group = 'com.github.rholder'
-version = '3.0.0'
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.github.rholder:gradle-one-jar:1.0.4'
-    }
-}
+version = '4.0.0-SNAPSHOT'
 
 allprojects {
     repositories {
-        maven {
-            url 'http://repo.gradle.org/gradle/libs-releases-local'
-        }
         mavenCentral()
+        maven {
+            name 'gradle-releases'
+            url 'https://repo.gradle.org/gradle/libs-releases'
+        }
+    }
+    intellij {
+        version ideaVersion
+        type "IC"
+        pluginName 'gradle-view'
+        downloadSources true
     }
 }
 
@@ -41,8 +42,10 @@ jar {
         from 'META-INF/plugin.xml'
         from 'LICENSE'
     }
+
+    // gradle-acumen is extracted and referenced at runtime so it needs to exist inside this jar
     into('') {
-        // well this is wonky...
+        // manually add the gradle-acumen jar inside this new jar
         from 'gradle-acumen/build/libs/gradle-acumen-0.3.0.jar'
     }
 }
@@ -56,9 +59,9 @@ dependencies {
     runtime 'org.slf4j:slf4j-simple:1.7.2'
 
     // IntelliJ plugin runtime libraries, since they're not available from a convenient repo
-    provided files('intellij/extensions-135.690.jar')
-    provided files('intellij/openapi-135.690.jar')
-    provided files('intellij/util-135.690.jar')
+    // provided files('intellij/extensions-135.690.jar')
+    // provided files('intellij/openapi-135.690.jar')
+    // provided files('intellij/util-135.690.jar')
 
     // force this project to build before assembling jar so we can stuff it in there
     provided project(':gradle-acumen')
@@ -70,15 +73,15 @@ dependencies {
 }
 
 // ensure our project type is set to IntelliJ plugin
-idea.module {
-    jdkName = ideaPluginJdkName
-    iml {
-        withXml {
-            def node = it.asNode()
-            node.attributes().put('type','PLUGIN_MODULE')
-        }
-    }
-}
+// idea.module {
+//     jdkName = ideaPluginJdkName
+//     iml {
+//         withXml {
+//             def node = it.asNode()
+//             node.attributes().put('type','PLUGIN_MODULE')
+//         }
+//     }
+// }
 
 task distPlugin(type: Zip, dependsOn: jar) {
     description = "Generate the IntelliJ plugin archive from the current project."
@@ -89,12 +92,25 @@ task distPlugin(type: Zip, dependsOn: jar) {
     }
 }
 
-task distStandalone(type: OneJar) {
-    group = "Distribution"
-    mainClass = 'com.github.rholder.gradle.ui.DependencyViewerStandalone'
+shadowJar {
+    // this is the standalone main that will run outside of IDEA, shadowing builds a fat jar
+    manifest {
+        attributes 'Main-Class': 'com.github.rholder.gradle.ui.DependencyViewerStandalone'
+    }
 }
 
-// enable Gradle Wrapper support for bootstrapping with specific version
-task wrapper(type: Wrapper) {
-    gradleVersion = gradleToolingApiVersion
+task distStandalone(type: Zip, dependsOn: shadowJar) {
+    description = "Generate a standalone binary from the current project."
+    group = "Distribution"
+    archiveFileName = 'gradle-view-standalone.jar'
+
+    // grab everything from inside the shadow'd jar, including META-INF
+    into('') {
+        from zipTree(shadowJar.archivePath)
+    }
+
+    // manually add the gradle-acumen jar inside this new jar
+    into('') {
+        from 'gradle-acumen/build/libs/gradle-acumen-0.3.0.jar'
+    }
 }
