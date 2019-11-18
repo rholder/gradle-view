@@ -169,7 +169,7 @@ public class DependencyViewerStandalone extends JFrame {
 
     private void promptForGradleBaseDir() {
         JFileChooser c = new JFileChooser();
-        c.setDialogTitle("Pick the top level directory to use when viewing dependencies (in case you have a multi-module project)");
+        c.setDialogTitle("Pick the top level directory to use when viewing dependencies (in case you have a multi-module project).");
         c.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         int result = c.showOpenDialog(this);
         if(result == JFileChooser.APPROVE_OPTION) {
