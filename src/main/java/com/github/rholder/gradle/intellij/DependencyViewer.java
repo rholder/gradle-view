@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.rholder.gradle.dependency.DependencyConversionUtil.loadProjectDependenciesFromModel;
-import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
 import static com.github.rholder.gradle.ui.TreeUtil.convertToHierarchyTreeNode;
+import static com.github.rholder.gradle.ui.TreeUtil.convertToSortedTreeNode;
 
 public class DependencyViewer extends SimpleToolWindowPanel {
 
@@ -85,19 +85,21 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         gradleService.addListener(new ViewActionListener() {
             @Override
             public void refresh() {
-                if(shouldPromptForCurrentProject) {
-                    switch(useCurrentProjectBuild()) {
-                        case 0: gradleBaseDir = project.getBasePath();
-                                break;
-                        default: // do nothing, stay null
+                // prompt only on first use of tool panel
+                if (shouldPromptForCurrentProject) {
+                    // ask to initialize view for this project to the current project
+                    if (useCurrentProjectBuild()) {
+                        gradleBaseDir = project.getBasePath();
                     }
                     shouldPromptForCurrentProject = false;
                 }
 
+                // there's nothing to do when there is no gradleBaseDir set, instead issue a prompt
                 if(gradleBaseDir == null) {
                     promptForGradleBaseDir();
                 }
 
+                // initialize an empty view even if the gradleBaseDir is set while we load everything in the background
                 updateView(null, null);
 
                 new SwingWorker<GradleNode, Void>() {
@@ -205,8 +207,8 @@ public class DependencyViewer extends SimpleToolWindowPanel {
     private void promptForGradleBaseDir() {
         FileChooserDescriptor fcd = FileChooserDescriptorFactory.createSingleFolderDescriptor();
         fcd.setShowFileSystemRoots(true);
-        fcd.setTitle("Choose a Gradle folder...");
-        fcd.setDescription("Pick the top level directory to use when viewing dependencies (in case you have a multi-module project)");
+        fcd.setTitle("Choose a Project Folder");
+        fcd.setDescription("Pick the top level directory to use when viewing dependencies (in case you have a multi-module project).");
         fcd.setHideIgnored(false);
 
         FileChooser.chooseFiles(fcd, project, project.getBaseDir(), new Consumer<List<VirtualFile>>() {
@@ -217,10 +219,11 @@ public class DependencyViewer extends SimpleToolWindowPanel {
         });
     }
 
-    private int useCurrentProjectBuild() {
-        return Messages.showYesNoDialog(
+    private boolean useCurrentProjectBuild() {
+        int answer = Messages.showYesNoDialog(
                 "Would you like to view the current project's Gradle dependencies?",
                 "Gradle Dependency Viewer",
-                null);
+                Messages.getQuestionIcon());
+        return answer == Messages.YES;
     }
 }
