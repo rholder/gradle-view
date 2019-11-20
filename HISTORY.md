@@ -1,3 +1,10 @@
+## 4.0.0 - 2019-11-20
+* Upgrade internal tooling API to use Gradle 5.6.2 which adds Java 11 support
+* Gradle wrapper is now at Gradle 5.6.2
+* Java bytecode compatibility bumped up to 1.8 to support later versions of Gradle Tooling API
+* Switch to using the org.jetbrains.intellij plugin for more modern plugin development
+* Removed old gradle-one-jar plugin in favor of shadow
+
 ## 3.0.0 - 2017-11-21
 * Upgrade internal tooling API to use Gradle 3.5.1
 * Add dependency resolution compatibility fixes to support Gradle 2.x, 3.x, and 4.x
