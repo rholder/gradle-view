@@ -18,15 +18,25 @@
 
         <p><b>Features</b></p>
         <ul>
-            <li>Built on the Gradle Tooling API 3.5.1, but should work on most 1.x, 2.x, 3.x, and 4.x versions</li>
+            <li>Built on the Gradle Tooling API 5.6.2, but should work on other recent versions</li>
             <li>Visual highlighting to indicate dependencies in use and replacement versions</li>
             <li>Lexicographically sorted listing for all Gradle configurations</li>
             <li>Load any project's Gradle dependencies, not just the one currently open inside IntelliJ</li>
             <li>Toggle the showing of replaced dependencies</li>
         </ul>
     ]]></description>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
     <change-notes><![CDATA[
+    <p>4.0.0 - 2019-11-20
+    <ul>
+        <li>Upgrade internal tooling API to use Gradle 5.6.2 which adds Java 11 support</li>
+        <li>Gradle wrapper is now at Gradle 5.6.2</li>
+        <li>Java bytecode compatibility bumped up to 1.8 to support later versions of Gradle Tooling API</li>
+        <li>Switch to using the org.jetbrains.intellij plugin for more modern plugin development</li>
+        <li>Removed old gradle-one-jar plugin in favor of shadow</li>
+    </ul>
+    </p>
+
     <p>3.0.0 - 2017-11-21
     <ul>
         <li>Upgrade internal tooling API to use Gradle 3.5.1</li>
