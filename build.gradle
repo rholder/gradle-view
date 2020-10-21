@@ -3,7 +3,10 @@ plugins {
     id "idea"
     id "org.jetbrains.intellij" version "0.4.13"
     id "com.github.johnrengelman.shadow" version "5.1.0"
+    id "com.github.ben-manes.versions" version "0.33.0"
 }
+
+apply from: "gradle/versions.gradle"
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
